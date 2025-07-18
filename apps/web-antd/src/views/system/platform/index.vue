@@ -33,69 +33,9 @@ const activePolicyTab = ref('service');
 
 // ======================== 首页设置 ========================
 const banners = ref<Carousel[]>([]);
-const bannerTotal = ref(0);
-const bannerPage = ref<number>(1);
-const bannerPageSize = ref<number>(10);
-const bannerLoading = ref(false);
-// 轮播图表格列
-const bannerColumns = [
-  { field: 'id', title: 'ID', width: 100 },
-  { field: 'sort', title: '排序', width: 120 },
-  { field: 'title', title: '标题' },
-  { field: 'imageUrl', title: '图片', cellRender: { name: 'CellImage' } },
-  { field: 'linkUrl', title: '跳转链接', showOverflow: true },
-  {
-    field: 'status',
-    title: '状态',
-    cellRender: {
-      name: 'CellDict',
-      props: { type: DICT_TYPE.COMMON_STATUS },
-    },
-  },
-  {
-    title: '操作',
-    field: 'action',
-    resizable: false,
-    slots: { default: 'action' },
-    width: 150,
-  },
-];
 
-const [Grid, GridApi] = useVbenVxeGrid({
-  gridOptions: {
-    columns: bannerColumns,
-    data: banners.value,
-    loading: bannerLoading.value,
-    pagerConfig: {
-      enabled: true,
-      pageSize: bannerPageSize.value,
-      currentPage: bannerPage.value,
-      total: bannerTotal.value,
-    },
-    proxyConfig: {
-      ajax: {
-        query: async ({
-          page,
-        }: {
-          page: { currentPage: number; pageSize: number };
-        }) => {
-          return await getCarouselPage({
-            pageNo: page.currentPage,
-            pageSize: page.pageSize,
-            title: '',
-            status: 0,
-            createTime: '',
-          });
-        },
-      },
-    },
-    rowConfig: { keyField: 'id' },
-    minHeight: 300,
-  },
-});
-
-// 轮播图操作
-const bannerFormSchema = [
+// 轮播图操作表单配置
+const bannerModalFormSchema = [
   {
     fieldName: 'id',
     component: 'Input',
@@ -147,7 +87,7 @@ const bannerFormSchema = [
 ];
 
 const [BannerForm, bannerFormApi] = useVbenForm({
-  schema: bannerFormSchema,
+  schema: bannerModalFormSchema,
   showDefaultActions: false,
 });
 const [BannerModal, bannerModalApi] = useVbenModal({
@@ -179,9 +119,105 @@ const [BannerModal, bannerModalApi] = useVbenModal({
           bannerFormApi.setValues(res);
         });
       } else {
-        bannerFormApi.setValues({ status: 0, sort: banners.value.length + 1 });
+        bannerFormApi.setValues({ status: 0 });
       }
     }
+  },
+});
+
+// 轮播图表格列
+const bannerColumns = [
+  { field: 'id', title: 'ID', width: 100 },
+  { field: 'sort', title: '排序', width: 120 },
+  { field: 'title', title: '标题' },
+  { field: 'imageUrl', title: '图片', cellRender: { name: 'CellImage' } },
+  { field: 'linkUrl', title: '跳转链接', showOverflow: true },
+  {
+    field: 'status',
+    title: '状态',
+    cellRender: {
+      name: 'CellDict',
+      props: { type: DICT_TYPE.COMMON_STATUS },
+    },
+  },
+  {
+    title: '操作',
+    field: 'action',
+    resizable: false,
+    slots: { default: 'action' },
+    width: 150,
+  },
+];
+
+// 轮播图搜索表单配置
+const bannerFormSchema = [
+  {
+    component: 'Input',
+    fieldName: 'title',
+    label: '标题',
+    componentProps: {
+      placeholder: '请输入轮播图标题',
+      allowClear: true,
+    },
+  },
+  {
+    component: 'Select',
+    fieldName: 'status',
+    label: '状态',
+    componentProps: {
+      placeholder: '请选择状态',
+      allowClear: true,
+      options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
+    },
+  },
+  {
+    label: '创建时间',
+    component: 'RangePicker',
+    fieldName: 'createTime',
+    componentProps: {
+      placeholder: ['开始时间', '结束时间'],
+      allowClear: true,
+      format: 'YYYY-MM-DD HH:mm:ss',
+      valueFormat: 'YYYY-MM-DD HH:mm:ss',
+      showTime: { format: 'HH:mm:ss' },
+    },
+  },
+];
+
+const [Grid, GridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: bannerFormSchema,
+  },
+  gridOptions: {
+    columns: bannerColumns,
+    height: 'auto',
+    keepSource: true,
+    proxyConfig: {
+      ajax: {
+        query: async (
+          { page }: { page: { currentPage: number; pageSize: number } },
+          formValues: any,
+        ) => {
+          // 处理时间范围参数
+          const params = { ...formValues };
+          if (!params.createTime || !Array.isArray(params.createTime)) {
+            // 如果不是数组或为空，清空参数
+            delete params.createTime;
+          }
+
+          return await getCarouselPage({
+            pageNo: page.currentPage,
+            pageSize: page.pageSize,
+            ...params,
+          });
+        },
+      },
+    },
+    rowConfig: { keyField: 'id' },
+    toolbarConfig: {
+      refresh: { code: 'query' },
+      search: true,
+    },
   },
 });
 
@@ -295,40 +331,42 @@ onMounted(() => {
   <Page auto-content-height>
     <Card>
       <!-- 主 Tab -->
-      <Tabs v-model:active-key="activeMainTab" type="card">
+      <Tabs v-model:active-key="activeMainTab" tab-position="left">
         <!-- 首页设置 Tab -->
         <TabPane key="homepage" tab="首页设置">
-          <Grid table-title="轮播图列表">
-            <template #toolbar-tools>
-              <TableAction
-                :actions="[
-                  {
-                    label: '添加轮播图',
-                    type: 'primary',
-                    icon: 'ant-design:plus-outlined',
-                    onClick: handleAddBanner,
-                  },
-                ]"
-              />
-            </template>
-            <template #action="{ row }">
-              <TableAction
-                :actions="[
-                  {
-                    label: '编辑',
-                    type: 'link',
-                    onClick: () => handleEditBanner(row),
-                  },
-                  {
-                    label: '删除',
-                    type: 'link',
-                    danger: true,
-                    onClick: () => handleDeleteBanner(row.id),
-                  },
-                ]"
-              />
-            </template>
-          </Grid>
+          <Page auto-content-height :height-offset="82">
+            <Grid table-title="轮播图列表">
+              <template #toolbar-tools>
+                <TableAction
+                  :actions="[
+                    {
+                      label: '添加轮播图',
+                      type: 'primary',
+                      icon: 'ant-design:plus-outlined',
+                      onClick: handleAddBanner,
+                    },
+                  ]"
+                />
+              </template>
+              <template #action="{ row }">
+                <TableAction
+                  :actions="[
+                    {
+                      label: '编辑',
+                      type: 'link',
+                      onClick: () => handleEditBanner(row),
+                    },
+                    {
+                      label: '删除',
+                      type: 'link',
+                      danger: true,
+                      onClick: () => handleDeleteBanner(row.id),
+                    },
+                  ]"
+                />
+              </template>
+            </Grid>
+          </Page>
         </TabPane>
 
         <!-- 政策设置 Tab -->
@@ -380,7 +418,6 @@ onMounted(() => {
     </Card>
   </Page>
 </template>
-
 <style scoped lang="less">
 .editor-header {
   display: flex;

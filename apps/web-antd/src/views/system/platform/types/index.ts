@@ -21,9 +21,9 @@ export interface CarouselList {
 }
 
 export interface CarouselPageParmas extends PageParam {
-  title: string;
-  status: number;
-  createTime: string;
+  title?: string;
+  status?: number;
+  createTime?: string;
 }
 
 // 政策设置 —— 协议类型
