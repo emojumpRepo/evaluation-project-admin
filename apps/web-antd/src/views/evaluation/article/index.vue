@@ -61,14 +61,12 @@ async function handleDelete(row: EmojumpArticleApi.Article) {
 
 /** 批量删除文章 */
 async function handleDeleteBatch() {
-  console.log('checkedIds', checkedIds.value);
   const hideLoading = message.loading({
     content: $t('ui.actionMessage.deleting'),
     duration: 0,
     key: 'action_process_msg',
   });
   try {
-    console.log('checkedIds', checkedIds.value.join(','));
     await deleteArticleBatch(checkedIds.value);
     message.success($t('ui.actionMessage.deleteSuccess'));
     onRefresh();
