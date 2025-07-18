@@ -1,4 +1,4 @@
-import { defHttp } from '#/utils/http';
+import { requestClient } from '#/api/request';
 
 export interface QuestionnaireVO {
   id?: number;
@@ -31,80 +31,60 @@ export interface QuestionnairePageReqVO {
 
 // 创建问卷
 export const createQuestionnaire = (data: QuestionnaireVO) => {
-  return defHttp.post<number>({
-    url: '/emojump/questionnaire/create',
-    data,
-  });
+  return requestClient.post('/emojump/questionnaire/create', data);
 };
 
 // 更新问卷
 export const updateQuestionnaire = (data: QuestionnaireVO) => {
-  return defHttp.put<boolean>({
-    url: '/emojump/questionnaire/update',
-    data,
-  });
+  return requestClient.put('/emojump/questionnaire/update', data);
 };
 
 // 删除问卷
 export const deleteQuestionnaire = (id: number) => {
-  return defHttp.delete<boolean>({
-    url: '/emojump/questionnaire/delete',
-    params: { id },
-  });
+  return requestClient.delete(`/emojump/questionnaire/delete?id=${id}`);
 };
 
 // 获取问卷详情
 export const getQuestionnaire = (id: number) => {
-  return defHttp.get<QuestionnaireVO>({
-    url: '/emojump/questionnaire/get',
-    params: { id },
-  });
+  return requestClient.get<QuestionnaireVO>(
+    `/emojump/questionnaire/get?id=${id}`,
+  );
 };
 
 // 获取问卷列表
 export const getQuestionnaireList = (params: QuestionnairePageReqVO) => {
-  return defHttp.get<{
+  return requestClient.get<{
     list: QuestionnaireVO[];
     total: number;
-  }>({
-    url: '/emojump/questionnaire/list',
-    params,
-  });
+  }>('/emojump/questionnaire/list', { params });
 };
 
 // 发布问卷
 export const publishQuestionnaire = (id: number) => {
-  return defHttp.post<boolean>({
-    url: '/emojump/questionnaire/publish',
-    params: { id },
-  });
+  return requestClient.post(`/emojump/questionnaire/publish?id=${id}`);
 };
 
 // 下线问卷
 export const unpublishQuestionnaire = (id: number) => {
-  return defHttp.post<boolean>({
-    url: '/emojump/questionnaire/unpublish',
-    params: { id },
-  });
+  return requestClient.post(`/emojump/questionnaire/unpublish?id=${id}`);
 };
 
 // 获取已发布问卷列表
 export const getPublishedQuestionnaireList = (
   params: QuestionnairePageReqVO,
 ) => {
-  return defHttp.get<{
+  return requestClient.get<{
     list: QuestionnaireVO[];
     total: number;
-  }>({
-    url: '/emojump/questionnaire/published',
-    params,
-  });
+  }>('/emojump/questionnaire/published', { params });
 };
 
 // 测试问卷链接
 export const testQuestionnaireLink = (id: number) => {
-  return defHttp.post<boolean>({
-    url: '/emojump/questionnaire/test-link',
-    params: { id },
-  });
+  return requestClient.post(`/emojump/questionnaire/test-link?id=${id}`);
+};
+
+// 同步最新问卷数据
+export const syncQuestionnaireData = () => {
+  return requestClient.post('/emojump/questionnaire/sync');
 };
