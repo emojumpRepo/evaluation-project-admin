@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { QuestionnaireVO } from '#/api/emojump/questionnaire';
+import type { QuestionnaireVO } from '#/api/emojump/questionnaire/questionnaire';
 
 import { Page } from '@vben/common-ui';
 
@@ -16,7 +16,7 @@ import {
 import {
   getQuestionnaireList,
   syncQuestionnaireData,
-} from '#/api/emojump/questionnaire';
+} from '#/api/emojump/questionnaire/questionnaire';
 
 defineOptions({ name: 'QuestionnaireManagement' });
 

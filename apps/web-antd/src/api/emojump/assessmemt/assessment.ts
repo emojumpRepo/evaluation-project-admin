@@ -1,4 +1,4 @@
-import { defHttp } from '#/utils/http';
+import { requestClient } from '#/api/request';
 
 export interface AssessmentQuestionnaireVO {
   questionnaireId: number;
@@ -50,70 +50,66 @@ export interface AssessmentRespVO extends AssessmentVO {
 
 // 创建测评
 export const createAssessment = (data: AssessmentVO) => {
-  return defHttp.post<number>({
-    url: '/emojump/assessment/create',
-    data,
-  });
+  return requestClient.post<number>('/emojump/assessment/create', data);
 };
 
 // 更新测评
 export const updateAssessment = (data: AssessmentVO) => {
-  return defHttp.put<boolean>({
-    url: '/emojump/assessment/update',
-    data,
-  });
+  return requestClient.put<boolean>('/emojump/assessment/update', data);
 };
 
 // 删除测评
 export const deleteAssessment = (id: number) => {
-  return defHttp.delete<boolean>({
-    url: '/emojump/assessment/delete',
-    params: { id },
+  return requestClient.delete<boolean>('/emojump/assessment/delete', {
+    params: {
+      id,
+    },
   });
 };
 
 // 获取测评详情
 export const getAssessment = (id: number) => {
-  return defHttp.get<AssessmentRespVO>({
-    url: '/emojump/assessment/get',
-    params: { id },
+  return requestClient.get<AssessmentRespVO>(`/emojump/assessment/get`, {
+    params: {
+      id,
+    },
   });
 };
 
 // 获取测评列表
 export const getAssessmentList = (params: AssessmentPageReqVO) => {
-  return defHttp.get<{
+  return requestClient.get<{
     list: AssessmentRespVO[];
     total: number;
-  }>({
-    url: '/emojump/assessment/list',
+  }>(`/emojump/assessment/page`, {
     params,
   });
 };
 
 // 发布测评
 export const publishAssessment = (id: number) => {
-  return defHttp.post<boolean>({
-    url: '/emojump/assessment/publish',
-    params: { id },
+  return requestClient.post<boolean>(`/emojump/assessment/publish`, {
+    params: {
+      id,
+    },
   });
 };
 
 // 取消发布测评
 export const unpublishAssessment = (id: number) => {
-  return defHttp.post<boolean>({
-    url: '/emojump/assessment/unpublish',
-    params: { id },
+  return requestClient.post<boolean>(`/emojump/assessment/unpublish`, {
+    params: {
+      id,
+    },
   });
 };
 
 // 获取可选择的问卷列表
 export const getAvailableQuestionnaires = (params: any) => {
-  return defHttp.get<{
+  return requestClient.get<{
     list: any[];
     total: number;
-  }>({
-    url: '/emojump/assessment/available-questionnaires',
+  }>(`/emojump/assessment/available-questionnaires`, {
     params,
   });
 };
