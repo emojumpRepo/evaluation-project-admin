@@ -1,130 +1,38 @@
 <script setup lang="ts">
-import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { QuestionnaireVO } from '#/api/emojump/questionnaire/questionnaire';
+import type {
+  OnActionClickParams,
+  VxeTableGridOptions,
+} from '#/adapter/vxe-table';
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
 
-import { Page } from '@vben/common-ui';
+import { onMounted } from 'vue';
+
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import { message, Tag } from 'ant-design-vue';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   getStatusColor,
+  getStatusLabel,
   getTypeLabel,
-  QUESTIONNAIRE_STATUS_OPTIONS,
-  QUESTIONNAIRE_TYPE_OPTIONS,
-} from '#/api/emojump/constants';
+} from '#/api/evaluation/constants';
 import {
+  deleteQuestionnaire,
   getQuestionnaireList,
   syncQuestionnaireData,
-} from '#/api/emojump/questionnaire/questionnaire';
+} from '#/api/evaluation/questionnaire/index';
+import { $t } from '#/locales';
+
+import { useQuestionGridColumns, useQuestionGridFormSchema } from './data';
+import AddForm from './modules/add-form.vue';
 
 defineOptions({ name: 'QuestionnaireManagement' });
 
-// 表格列配置
-function useGridColumns() {
-  return [
-    { title: '序号', type: 'seq', width: 50 },
-    { field: 'title', title: '问卷标题', width: 200, showOverflow: true },
-    { field: 'description', title: '问卷描述', width: 250, showOverflow: true },
-    {
-      field: 'type',
-      title: '问卷类型',
-      width: 120,
-      slots: { default: 'type' },
-    },
-    {
-      field: 'status',
-      title: '状态',
-      width: 100,
-      slots: { default: 'status' },
-    },
-    { field: 'targetAudience', title: '目标受众', width: 120 },
-    { field: 'estimatedDuration', title: '预计时长(分钟)', width: 120 },
-    { field: 'accessCount', title: '访问次数', width: 100 },
-    { field: 'completionCount', title: '完成次数', width: 100 },
-    {
-      field: 'isOpen',
-      title: '是否开放',
-      width: 100,
-      slots: { default: 'isOpen' },
-    },
-    {
-      field: 'validFrom',
-      title: '有效期开始',
-      width: 150,
-      formatter: 'formatDate',
-    },
-    {
-      field: 'validTo',
-      title: '有效期结束',
-      width: 150,
-      formatter: 'formatDate',
-    },
-    { field: 'creator', title: '创建人', width: 100 },
-    {
-      field: 'createTime',
-      title: '创建时间',
-      width: 150,
-      formatter: 'formatDateTime',
-    },
-  ];
-}
-
-// 搜索表单配置
-function useGridFormSchema() {
-  return [
-    {
-      component: 'Input',
-      fieldName: 'title',
-      label: '问卷标题',
-      componentProps: {
-        placeholder: '请输入问卷标题',
-        allowClear: true,
-      },
-    },
-    {
-      component: 'Select',
-      fieldName: 'type',
-      label: '问卷类型',
-      componentProps: {
-        placeholder: '请选择问卷类型',
-        allowClear: true,
-        options: QUESTIONNAIRE_TYPE_OPTIONS,
-      },
-    },
-    {
-      component: 'Select',
-      fieldName: 'status',
-      label: '状态',
-      componentProps: {
-        placeholder: '请选择状态',
-        allowClear: true,
-        options: QUESTIONNAIRE_STATUS_OPTIONS,
-      },
-    },
-    {
-      component: 'RangePicker',
-      fieldName: 'createTime',
-      label: '创建时间',
-      componentProps: {
-        placeholder: ['开始时间', '结束时间'],
-        format: 'YYYY-MM-DD',
-      },
-    },
-    {
-      component: 'Switch',
-      fieldName: 'isOpen',
-      label: '是否开放',
-      componentProps: {
-        checkedValue: true,
-        unCheckedValue: false,
-        style: {
-          width: '40px',
-        },
-      },
-    },
-  ];
-}
+const [FormModal, formModalApi] = useVbenModal({
+  connectedComponent: AddForm,
+  destroyOnClose: true,
+});
 
 // 同步数据
 async function handleSync() {
@@ -153,15 +61,55 @@ async function handleSync() {
 
 // 刷新表格
 function onRefresh() {
-  gridApi.reload();
+  gridApi.query();
+}
+
+/** 创建测评 */
+function onCreate() {
+  formModalApi.setData({}).open();
+}
+
+/** 编辑测评 */
+function onEdit(row: QuestionnaireVO) {
+  formModalApi.setData(row).open();
+}
+
+/** 删除测评 */
+async function onDelete(row: QuestionnaireVO) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.deleting', [row.id]),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await deleteQuestionnaire(row.id as number);
+    message.success($t('ui.actionMessage.deleteSuccess', [row.id]));
+    onRefresh();
+  } finally {
+    hideLoading();
+  }
+}
+
+/** 表格操作按钮的回调函数 */
+function onActionClick({ code, row }: OnActionClickParams<QuestionnaireVO>) {
+  switch (code) {
+    case 'delete': {
+      onDelete(row);
+      break;
+    }
+    case 'edit': {
+      onEdit(row);
+      break;
+    }
+  }
 }
 
 const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
-    schema: useGridFormSchema(),
+    schema: useQuestionGridFormSchema(),
   },
   gridOptions: {
-    columns: useGridColumns(),
+    columns: useQuestionGridColumns(onActionClick),
     height: 'auto',
     keepSource: true,
     proxyConfig: {
@@ -181,13 +129,21 @@ const [Grid, gridApi] = useVbenVxeGrid({
     toolbarConfig: {
       refresh: { code: 'query' },
       search: true,
+      zoom: false,
+      custom: false,
     },
   } as VxeTableGridOptions<QuestionnaireVO>,
+});
+
+onMounted(() => {
+  gridApi.query();
 });
 </script>
 
 <template>
   <Page auto-content-height>
+    <FormModal @success="onRefresh" />
+
     <Grid table-title="问卷管理">
       <template #toolbar-tools>
         <TableAction
@@ -197,6 +153,12 @@ const [Grid, gridApi] = useVbenVxeGrid({
               type: 'primary',
               icon: ACTION_ICON.REFRESH,
               onClick: handleSync,
+            },
+            {
+              label: '添加问卷',
+              type: 'primary',
+              icon: ACTION_ICON.ADD,
+              onClick: onCreate,
             },
           ]"
         />
@@ -210,11 +172,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
       <!-- 状态列 -->
       <template #status="{ row }">
         <Tag :color="getStatusColor(row.status, 'questionnaire')">
-          {{
-            QUESTIONNAIRE_STATUS_OPTIONS.find(
-              (item) => item.value === row.status,
-            )?.label || '未知状态'
-          }}
+          {{ getStatusLabel(row.status, 'questionnaire') }}
         </Tag>
       </template>
 

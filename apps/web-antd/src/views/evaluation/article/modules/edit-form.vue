@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { EmojumpArticleApi } from '#/api/emojump/article/index';
+import type { EmojumpArticleApi } from '#/api/evaluation/article/index';
 
 import { computed, ref } from 'vue';
 
@@ -13,7 +13,7 @@ import {
   addArticle,
   editArticle,
   getArticleDetail,
-} from '#/api/emojump/article';
+} from '#/api/evaluation/article';
 import { $t } from '#/locales';
 
 import { useFormSchema } from '../data';

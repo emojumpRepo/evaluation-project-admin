@@ -1,28 +1,29 @@
 <script lang="ts" setup>
-import type { Demo03StudentApi } from '#/api/infra/demo/demo03/erp';
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
 
 import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
+import dayjs from 'dayjs';
 
 import { useVbenForm } from '#/adapter/form';
 import {
-  createDemo03Student,
-  getDemo03Student,
-  updateDemo03Student,
-} from '#/api/infra/demo/demo03/erp';
+  createQuestionnaire,
+  getQuestionnaire,
+  updateQuestionnaire,
+} from '#/api/evaluation/questionnaire/index';
 import { $t } from '#/locales';
 
-import { useFormSchema } from '../data';
+import { useQuestionFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
-const formData = ref<Demo03StudentApi.Demo03Student>();
+const formData = ref<QuestionnaireVO>();
 const getTitle = computed(() => {
   return formData.value?.id
-    ? $t('ui.actionTitle.edit', ['学生'])
-    : $t('ui.actionTitle.create', ['学生']);
+    ? $t('ui.actionTitle.edit', ['问卷'])
+    : $t('ui.actionTitle.create', ['编辑']);
 });
 
 const [Form, formApi] = useVbenForm({
@@ -31,10 +32,10 @@ const [Form, formApi] = useVbenForm({
       class: 'w-full',
     },
     formItemClass: 'col-span-2',
-    labelWidth: 80,
+    labelWidth: 120,
   },
   layout: 'horizontal',
-  schema: useFormSchema(),
+  schema: useQuestionFormSchema(),
   showDefaultActions: false,
 });
 
@@ -46,11 +47,17 @@ const [Modal, modalApi] = useVbenModal({
     }
     modalApi.lock();
     // 提交表单
-    const data = (await formApi.getValues()) as Demo03StudentApi.Demo03Student;
+    const data = (await formApi.getValues()) as QuestionnaireVO;
+    const formatData = {
+      ...data,
+      validFrom: dayjs(data.validFrom).format('YYYY-MM-DD HH:mm:ss'),
+      validTo: dayjs(data.validTo).format('YYYY-MM-DD HH:mm:ss'),
+    };
+
     try {
-      await (formData.value?.id
-        ? updateDemo03Student(data)
-        : createDemo03Student(data));
+      await (data?.id
+        ? updateQuestionnaire(formatData)
+        : createQuestionnaire(formatData));
       // 关闭并提示
       await modalApi.close();
       emit('success');
@@ -65,14 +72,14 @@ const [Modal, modalApi] = useVbenModal({
       return;
     }
     // 加载数据
-    let data = modalApi.getData<Demo03StudentApi.Demo03Student>();
+    let data = modalApi.getData<QuestionnaireVO>();
     if (!data) {
       return;
     }
     if (data.id) {
       modalApi.lock();
       try {
-        data = await getDemo03Student(data.id);
+        data = await getQuestionnaire(data.id);
       } finally {
         modalApi.unlock();
       }
@@ -85,7 +92,12 @@ const [Modal, modalApi] = useVbenModal({
 </script>
 
 <template>
-  <Modal :title="getTitle">
+  <Modal
+    :title="getTitle"
+    class="w-[900px]"
+    :fullscreen-button="false"
+    :destroy-on-close="true"
+  >
     <Form class="mx-4" />
   </Modal>
 </template>

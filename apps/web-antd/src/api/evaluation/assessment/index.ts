@@ -48,6 +48,41 @@ export interface AssessmentRespVO extends AssessmentVO {
   }[];
 }
 
+export interface AssessmentResultPageReqVO {
+  pageNo?: number;
+  pageSize?: number;
+  assessmentId?: number;
+  userId?: number;
+  status?: number;
+  completedTime?: string[];
+}
+
+export interface QuestionnaireResultRespVO {
+  id: number;
+  questionnaireId: number;
+  questionnaireTitle: string;
+  resultData: string;
+  score: number;
+  level: string;
+  report: string;
+  completedTime: string;
+}
+
+export interface AssessmentResultRespVO {
+  id?: number;
+  assessmentId: number;
+  assessmentTitle: string;
+  userId: number;
+  userName: string;
+  overallScore: number;
+  overallLevel: string;
+  overallReport: string;
+  completedTime: string;
+  status: number;
+  createTime: string;
+  questionnaireResults: QuestionnaireResultRespVO[];
+}
+
 // 创建测评
 export const createAssessment = (data: AssessmentVO) => {
   return requestClient.post<number>('/emojump/assessment/create', data);
@@ -81,7 +116,7 @@ export const getAssessmentList = (params: AssessmentPageReqVO) => {
   return requestClient.get<{
     list: AssessmentRespVO[];
     total: number;
-  }>(`/emojump/assessment/page`, {
+  }>(`/emojump/assessment/list`, {
     params,
   });
 };
@@ -112,4 +147,26 @@ export const getAvailableQuestionnaires = (params: any) => {
   }>(`/emojump/assessment/available-questionnaires`, {
     params,
   });
+};
+
+// 获取测评结果列表
+export const getAssessmentResultPage = (params: AssessmentResultPageReqVO) => {
+  return requestClient.get<{
+    list: AssessmentResultRespVO[];
+    total: number;
+  }>(`/emojump/assessment-result/page`, {
+    params,
+  });
+};
+
+// 获取测评结果详情
+export const getAssessmentResult = (id: number) => {
+  return requestClient.get<AssessmentResultRespVO>(
+    `/emojump/assessment-result/get`,
+    {
+      params: {
+        id,
+      },
+    },
+  );
 };

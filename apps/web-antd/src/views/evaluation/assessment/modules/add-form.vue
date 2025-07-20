@@ -1,28 +1,29 @@
 <script lang="ts" setup>
-import type { Demo03StudentApi } from '#/api/infra/demo/demo03/erp';
+import type { AssessmentVO } from '#/api/evaluation/assessment/index';
 
 import { computed, ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
+import dayjs from 'dayjs';
 
 import { useVbenForm } from '#/adapter/form';
 import {
-  createDemo03Grade,
-  getDemo03Grade,
-  updateDemo03Grade,
-} from '#/api/infra/demo/demo03/erp';
+  createAssessment,
+  getAssessment,
+  updateAssessment,
+} from '#/api/evaluation/assessment/index';
 import { $t } from '#/locales';
 
-import { useDemo03GradeFormSchema } from '../data';
+import { useAssessmentFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
-const formData = ref<Demo03StudentApi.Demo03Grade>();
+const formData = ref<AssessmentVO>();
 const getTitle = computed(() => {
   return formData.value?.id
-    ? $t('ui.actionTitle.edit', ['学生班级'])
-    : $t('ui.actionTitle.create', ['学生班级']);
+    ? $t('ui.actionTitle.edit', ['测评'])
+    : $t('ui.actionTitle.create', ['测评']);
 });
 
 const [Form, formApi] = useVbenForm({
@@ -31,10 +32,10 @@ const [Form, formApi] = useVbenForm({
       class: 'w-full',
     },
     formItemClass: 'col-span-2',
-    labelWidth: 80,
+    labelWidth: 120,
   },
   layout: 'horizontal',
-  schema: useDemo03GradeFormSchema(),
+  schema: useAssessmentFormSchema(),
   showDefaultActions: false,
 });
 
@@ -44,15 +45,19 @@ const [Modal, modalApi] = useVbenModal({
     if (!valid) {
       return;
     }
-
     modalApi.lock();
     // 提交表单
-    const data = (await formApi.getValues()) as Demo03StudentApi.Demo03Grade;
-    data.studentId = formData.value?.studentId;
+    const data = (await formApi.getValues()) as AssessmentVO;
+    const formatData = {
+      ...data,
+      startTime: dayjs(Number(data.startTime)).format('YYYY-MM-DD HH:mm:ss'),
+      endTime: dayjs(Number(data.endTime)).format('YYYY-MM-DD HH:mm:ss'),
+    };
+
     try {
-      await (formData.value?.id
-        ? updateDemo03Grade(data)
-        : createDemo03Grade(data));
+      await (formatData?.id
+        ? updateAssessment(formatData)
+        : createAssessment(formatData));
       // 关闭并提示
       await modalApi.close();
       emit('success');
@@ -66,16 +71,15 @@ const [Modal, modalApi] = useVbenModal({
       formData.value = undefined;
       return;
     }
-
     // 加载数据
-    let data = modalApi.getData<Demo03StudentApi.Demo03Grade>();
+    let data = modalApi.getData<AssessmentVO>();
     if (!data) {
       return;
     }
     if (data.id) {
       modalApi.lock();
       try {
-        data = await getDemo03Grade(data.id);
+        data = await getAssessment(data.id);
       } finally {
         modalApi.unlock();
       }
@@ -88,7 +92,12 @@ const [Modal, modalApi] = useVbenModal({
 </script>
 
 <template>
-  <Modal :title="getTitle">
+  <Modal
+    :title="getTitle"
+    class="w-[900px]"
+    :fullscreen-button="false"
+    :destroy-on-close="true"
+  >
     <Form class="mx-4" />
   </Modal>
 </template>

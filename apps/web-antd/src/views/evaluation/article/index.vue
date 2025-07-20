@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { EmojumpArticleApi } from '#/api/emojump/article';
+import type { EmojumpArticleApi } from '#/api/evaluation/article';
 
 import { ref } from 'vue';
 
@@ -14,7 +14,7 @@ import {
   deleteArticle,
   deleteArticleBatch,
   getArticleList,
-} from '#/api/emojump/article';
+} from '#/api/evaluation/article';
 import { $t } from '#/locales';
 
 import { useGridColumns } from './data';
@@ -106,6 +106,8 @@ const [Grid, gridApi] = useVbenVxeGrid({
     toolbarConfig: {
       refresh: { code: 'query' },
       search: true,
+      zoom: false,
+      custom: false,
     },
   } as VxeTableGridOptions<EmojumpArticleApi.Article>,
   gridEvents: {
