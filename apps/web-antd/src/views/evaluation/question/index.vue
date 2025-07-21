@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
-import type { QuestionnaireVO } from '#/api/emojump/questionnaire';
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire';
 
 import { Page } from '@vben/common-ui';
 
@@ -12,11 +12,11 @@ import {
   getTypeLabel,
   QUESTIONNAIRE_STATUS_OPTIONS,
   QUESTIONNAIRE_TYPE_OPTIONS,
-} from '#/api/emojump/constants';
+} from '#/api/evaluation/constants';
 import {
   getQuestionnaireList,
   syncQuestionnaireData,
-} from '#/api/emojump/questionnaire';
+} from '#/api/evaluation/questionnaire';
 
 defineOptions({ name: 'QuestionnaireManagement' });
 
@@ -40,7 +40,6 @@ function useGridColumns() {
     },
     { field: 'targetAudience', title: '目标受众', width: 120 },
     { field: 'estimatedDuration', title: '预计时长(分钟)', width: 120 },
-    { field: 'accessCount', title: '访问次数', width: 100 },
     { field: 'completionCount', title: '完成次数', width: 100 },
     {
       field: 'isOpen',
@@ -50,15 +49,15 @@ function useGridColumns() {
     },
     {
       field: 'validFrom',
-      title: '有效期开始',
-      width: 150,
-      formatter: 'formatDate',
+      title: '答题有效期开始',
+      width: 180,
+      formatter: 'formatDateTime',
     },
     {
       field: 'validTo',
-      title: '有效期结束',
-      width: 150,
-      formatter: 'formatDate',
+      title: '答题有效期结束',
+      width: 180,
+      formatter: 'formatDateTime',
     },
     { field: 'creator', title: '创建人', width: 100 },
     {
@@ -108,7 +107,10 @@ function useGridFormSchema() {
       label: '创建时间',
       componentProps: {
         placeholder: ['开始时间', '结束时间'],
-        format: 'YYYY-MM-DD',
+        allowClear: true,
+        format: 'YYYY-MM-DD HH:mm:ss',
+        valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        showTime: { format: 'HH:mm:ss' },
       },
     },
     {
