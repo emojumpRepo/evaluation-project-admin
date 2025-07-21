@@ -16,6 +16,8 @@
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
     "save": "Save",
     "import": "Import",
     "export": "Export",
