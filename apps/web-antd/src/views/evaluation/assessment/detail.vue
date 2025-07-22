@@ -120,7 +120,6 @@ async function init(assessmentId: number) {
 
 // 发布/取消发布
 const handlePublish = async () => {
-  console.log('请求参数', assessmentId.value);
   try {
     if (assessment.value?.status === 1) {
       await unpublishAssessment(assessmentId.value!);
@@ -145,14 +144,7 @@ const handleViewQuestionnaire = (link: string) => {
 
   try {
     // 在新标签页打开链接
-    const newWindow = window.open(link, '_blank', 'noopener,noreferrer');
-
-    // 检查是否成功打开新窗口（防止被浏览器阻止弹窗）
-    if (!newWindow) {
-      console.warn('无法打开新窗口，可能被浏览器阻止了弹窗');
-      // 备用方案：直接跳转
-      window.location.href = link;
-    }
+    window.open(link, '_blank', 'noopener,noreferrer');
   } catch (error) {
     message.error('打开链接失败');
     console.error('打开链接失败:', error);
