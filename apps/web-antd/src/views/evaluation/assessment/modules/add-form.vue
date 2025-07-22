@@ -49,8 +49,8 @@ const [Modal, modalApi] = useVbenModal({
     const data = (await formApi.getValues()) as AssessmentVO;
     const formatData = {
       ...data,
-      startTime: data.startTime ? new Date(data.startTime).getTime() : undefined,
-      endTime: data.endTime ? new Date(data.endTime).getTime() : undefined,
+      startTime: Number(data.startTime),
+      endTime: Number(data.endTime),
     };
 
     console.log('添加提交的表单', formatData)
