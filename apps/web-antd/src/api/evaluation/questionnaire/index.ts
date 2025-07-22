@@ -12,8 +12,8 @@ export interface QuestionnaireVO {
   accessCount?: number;
   completionCount?: number;
   isOpen?: boolean;
-  validFrom?: string;
-  validTo?: string;
+  validFrom?: number;
+  validTo?: number;
   remark?: string;
   createTime?: string;
   creator?: string;
@@ -64,9 +64,9 @@ export const publishQuestionnaire = (id: number) => {
   return requestClient.post(`/emojump/questionnaire/publish?id=${id}`);
 };
 
-// 下线问卷
-export const unpublishQuestionnaire = (id: number) => {
-  return requestClient.post(`/emojump/questionnaire/unpublish?id=${id}`);
+// 暂停问卷
+export const pauseQuestionnaire = (id: number) => {
+  return requestClient.post(`/emojump/questionnaire/pause?id=${id}`);
 };
 
 // 获取已发布问卷列表

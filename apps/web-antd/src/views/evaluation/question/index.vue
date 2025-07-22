@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import type {
-  OnActionClickParams,
-  VxeTableGridOptions,
-} from '#/adapter/vxe-table';
+import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
 
 import { onMounted } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
-import { message, Tag } from 'ant-design-vue';
+import {
+  Button,
+  DatePicker,
+  Dropdown,
+  Menu,
+  MenuItem,
+  message,
+  Tag,
+} from 'ant-design-vue';
+import dayjs from 'dayjs';
 
 import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
@@ -20,7 +26,10 @@ import {
 import {
   deleteQuestionnaire,
   getQuestionnaireList,
+  pauseQuestionnaire,
+  publishQuestionnaire,
   syncQuestionnaireData,
+  updateQuestionnaire,
 } from '#/api/evaluation/questionnaire/index';
 import { $t } from '#/locales';
 
@@ -85,17 +94,33 @@ async function onDelete(row: QuestionnaireVO) {
   }
 }
 
-/** 表格操作按钮的回调函数 */
-function onActionClick({ code, row }: OnActionClickParams<QuestionnaireVO>) {
-  switch (code) {
-    case 'delete': {
-      onDelete(row);
-      break;
-    }
-    case 'edit': {
-      onEdit(row);
-      break;
-    }
+async function onPublish(row: QuestionnaireVO) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.publishing', [row.title]),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await publishQuestionnaire(row.id as number);
+    message.success($t('ui.actionMessage.publishSuccess', [row.title]));
+    onRefresh();
+  } finally {
+    hideLoading();
+  }
+}
+
+async function onPause(row: QuestionnaireVO) {
+  const hideLoading = message.loading({
+    content: $t('ui.actionMessage.pausing', [row.title]),
+    duration: 0,
+    key: 'action_process_msg',
+  });
+  try {
+    await pauseQuestionnaire(row.id as number);
+    message.success($t('ui.actionMessage.pauseSuccess', [row.title]));
+    onRefresh();
+  } finally {
+    hideLoading();
   }
 }
 
@@ -104,9 +129,13 @@ const [Grid, gridApi] = useVbenVxeGrid({
     schema: useQuestionGridFormSchema(),
   },
   gridOptions: {
-    columns: useQuestionGridColumns(onActionClick),
+    columns: useQuestionGridColumns(),
     height: 'auto',
     keepSource: true,
+    editConfig: {
+      mode: 'row',
+      trigger: 'click',
+    },
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
@@ -129,6 +158,28 @@ const [Grid, gridApi] = useVbenVxeGrid({
     },
   } as VxeTableGridOptions<QuestionnaireVO>,
 });
+
+function hasEditStatus(row: QuestionnaireVO) {
+  return gridApi.grid?.isEditByRow(row);
+}
+
+async function saveRowEvent(row: QuestionnaireVO) {
+  await gridApi.grid?.clearEdit();
+  gridApi.setLoading(true);
+  try {
+    await updateQuestionnaire(row as QuestionnaireVO);
+    message.success($t('ui.actionMessage.operationSuccess'));
+    gridApi.query();
+  } catch {
+    message.error($t('ui.actionMessage.operationFailed'));
+  } finally {
+    gridApi.setLoading(false);
+  }
+}
+
+function cancelRowEvent() {
+  gridApi.grid?.clearEdit();
+}
 
 onMounted(() => {
   gridApi.query();
@@ -170,6 +221,83 @@ onMounted(() => {
         <Tag :color="row.isOpen ? 'green' : 'red'">
           {{ row.isOpen ? '开放' : '关闭' }}
         </Tag>
+      </template>
+
+      <!-- 答题有效期开始列 -->
+      <template #validFrom="{ row }">
+        {{
+          row.validFrom
+            ? dayjs(row.validFrom).format('YYYY-MM-DD HH:mm:ss')
+            : '0'
+        }}
+      </template>
+
+      <template #validFrom_edit="{ row }">
+        <DatePicker
+          v-model="row.validFrom"
+          type="datetime"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="x"
+          show-time
+        />
+      </template>
+
+      <!-- 答题有效期结束列 -->
+      <template #validTo="{ row }">
+        {{
+          row.validTo ? dayjs(row.validTo).format('YYYY-MM-DD HH:mm:ss') : '0'
+        }}
+      </template>
+
+      <template #validTo_edit="{ row }">
+        <DatePicker
+          v-model="row.validTo"
+          type="datetime"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="x"
+          show-time
+        />
+      </template>
+
+      <template #operation="{ row }">
+        <div v-if="hasEditStatus(row)" class="flex w-full items-center gap-2">
+          <Button type="primary" @click="saveRowEvent(row)"> 保存 </Button>
+          <Button type="text" @click="cancelRowEvent()"> 取消 </Button>
+          <Dropdown>
+            <Button type="link">更多</Button>
+            <template #overlay>
+              <Menu>
+                <MenuItem @click="onEdit(row)">编辑</MenuItem>
+                <MenuItem danger @click="onDelete(row)">删除</MenuItem>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
+        <div v-else class="flex w-full items-center gap-2">
+          <Button
+            v-if="![1, 3].includes(row.status)"
+            type="link"
+            @click="onPublish(row)"
+          >
+            发布
+          </Button>
+          <Button
+            v-else-if="[1, 3].includes(row.status)"
+            type="link"
+            @click="onPause(row)"
+          >
+            暂停
+          </Button>
+          <Dropdown>
+            <Button type="link">更多</Button>
+            <template #overlay>
+              <Menu>
+                <MenuItem @click="onEdit(row)">编辑</MenuItem>
+                <MenuItem danger @click="onDelete(row)">删除</MenuItem>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
       </template>
     </Grid>
   </Page>

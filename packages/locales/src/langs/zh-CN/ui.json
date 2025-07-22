@@ -32,7 +32,13 @@
     "importSuccess": "导入成功",
     "importFail": "导入失败",
     "downloadTemplateFail": "下载模板失败",
-    "updating": "正在更新 {0}..."
+    "updating": "正在更新 {0}...",
+    "publishing": "正在发布 {0}...",
+    "publishSuccess": "{0} 发布成功",
+    "publishFailed": "{0} 发布失败",
+    "pausing": "正在暂停 {0}...",
+    "pauseSuccess": "{0} 暂停成功",
+    "pauseFailed": "{0} 暂停失败"
   },
   "placeholder": {
     "input": "请输入",

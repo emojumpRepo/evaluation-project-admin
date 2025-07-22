@@ -50,8 +50,8 @@ const [Modal, modalApi] = useVbenModal({
     const data = (await formApi.getValues()) as QuestionnaireVO;
     const formatData = {
       ...data,
-      validFrom: dayjs(data.validFrom).format('YYYY-MM-DD HH:mm:ss'),
-      validTo: dayjs(data.validTo).format('YYYY-MM-DD HH:mm:ss'),
+      validFrom: Number(data.validFrom),
+      validTo: Number(data.validTo),
     };
 
     try {
@@ -84,9 +84,14 @@ const [Modal, modalApi] = useVbenModal({
         modalApi.unlock();
       }
     }
-    // 设置到 values
-    formData.value = data;
-    await formApi.setValues(formData.value);
+    // 设置到 values，时间戳转 dayjs 对象
+    const values: Record<string, any> = {
+      ...data,
+      validFrom: data.validFrom ? dayjs(data.validFrom) : undefined,
+      validTo: data.validTo ? dayjs(data.validTo) : undefined,
+    };
+    formData.value = values as QuestionnaireVO;
+    await formApi.setValues(values);
   },
 });
 </script>
