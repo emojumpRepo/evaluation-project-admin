@@ -1,3 +1,5 @@
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
+
 import { requestClient } from '#/api/request';
 
 export interface AssessmentQuestionnaireVO {
@@ -16,8 +18,8 @@ export interface AssessmentVO {
   status?: number;
   targetAudience?: string;
   duration?: number;
-  startTime?: string;
-  endTime?: string;
+  startTime?: number | string;
+  endTime?: number | string;
   needAppointment?: boolean;
   maxParticipants?: number;
   currentParticipants?: number;
@@ -123,20 +125,12 @@ export const getAssessmentList = (params: AssessmentPageReqVO) => {
 
 // 发布测评
 export const publishAssessment = (id: number) => {
-  return requestClient.post<boolean>(`/emojump/assessment/publish`, {
-    params: {
-      id,
-    },
-  });
+  return requestClient.post<boolean>(`/emojump/assessment/publish?id=${id}`);
 };
 
 // 取消发布测评
 export const unpublishAssessment = (id: number) => {
-  return requestClient.post<boolean>(`/emojump/assessment/unpublish`, {
-    params: {
-      id,
-    },
-  });
+  return requestClient.post<boolean>(`/emojump/assessment/unpublish?id=${id}`);
 };
 
 // 获取可选择的问卷列表
@@ -147,6 +141,18 @@ export const getAvailableQuestionnaires = (params: any) => {
   }>(`/emojump/assessment/available-questionnaires`, {
     params,
   });
+};
+
+// 根据测评ID获取关联的问卷列表
+export const getAssessmentQuestionnaires = (assessmentId: number) => {
+  return requestClient.get<QuestionnaireVO[]>(
+    `/emojump/assessment/questionnaires`,
+    {
+      params: {
+        assessmentId,
+      },
+    },
+  );
 };
 
 // 获取测评结果列表

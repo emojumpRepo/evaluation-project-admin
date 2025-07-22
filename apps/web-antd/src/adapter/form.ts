@@ -23,6 +23,7 @@ async function initSetupVbenForm() {
         Radio: 'checked',
         Switch: 'checked',
         Upload: 'fileList',
+        EditTable: 'tableList',
       },
     },
     defineRules: {

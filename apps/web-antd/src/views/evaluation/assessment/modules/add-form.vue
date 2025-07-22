@@ -6,7 +6,6 @@ import { computed, ref } from 'vue';
 import { useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
-import dayjs from 'dayjs';
 
 import { useVbenForm } from '#/adapter/form';
 import {
@@ -50,12 +49,14 @@ const [Modal, modalApi] = useVbenModal({
     const data = (await formApi.getValues()) as AssessmentVO;
     const formatData = {
       ...data,
-      startTime: dayjs(Number(data.startTime)).format('YYYY-MM-DD HH:mm:ss'),
-      endTime: dayjs(Number(data.endTime)).format('YYYY-MM-DD HH:mm:ss'),
+      startTime: data.startTime ? new Date(data.startTime).getTime() : undefined,
+      endTime: data.endTime ? new Date(data.endTime).getTime() : undefined,
     };
 
+    console.log('添加提交的表单', formatData)
+
     try {
-      await (formatData?.id
+      await (data?.id
         ? updateAssessment(formatData)
         : createAssessment(formatData));
       // 关闭并提示
@@ -79,14 +80,17 @@ const [Modal, modalApi] = useVbenModal({
     if (data.id) {
       modalApi.lock();
       try {
-        data = await getAssessment(data.id);
+        const respData = await getAssessment(data.id);
+        // 转换 AssessmentRespVO 到 AssessmentVO 格式
+        data = {
+          ...respData,
+        };
       } finally {
         modalApi.unlock();
       }
     }
-    // 设置到 values
-    formData.value = data;
-    await formApi.setValues(formData.value);
+    
+    await formApi.setValues(data);
   },
 });
 </script>

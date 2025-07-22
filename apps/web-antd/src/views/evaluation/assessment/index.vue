@@ -6,6 +6,7 @@ import type {
 import type { AssessmentVO } from '#/api/evaluation/assessment/index';
 
 import { h, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { Plus } from '@vben/icons';
@@ -29,8 +30,9 @@ import Form from './modules/add-form.vue';
 import ResultList from './modules/result-list.vue';
 
 /** 子表的列表 */
-// const subTabsName = ref('demo03Course');
 const selectAssessment = ref<AssessmentVO>();
+
+const router = useRouter();
 
 const [FormModal, formModalApi] = useVbenModal({
   connectedComponent: Form,
@@ -54,6 +56,16 @@ function onCreate() {
 //     : publishAssessment(row.id as number));
 //   onRefresh();
 // }
+
+/** 查看测评 */
+function onView(row: AssessmentVO) {
+  router.push({
+    path: '/evaluation/assessment/detail',
+    query: {
+      id: row.id,
+    },
+  });
+}
 
 /** 编辑测评 */
 function onEdit(row: AssessmentVO) {
@@ -85,6 +97,10 @@ function onActionClick({ code, row }: OnActionClickParams<AssessmentVO>) {
     }
     case 'edit': {
       onEdit(row);
+      break;
+    }
+    case 'view': {
+      onView(row);
       break;
     }
   }

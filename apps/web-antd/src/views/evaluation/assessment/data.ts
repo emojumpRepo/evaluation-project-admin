@@ -43,14 +43,10 @@ export function useAssessmentFormSchema(): VbenFormSchema[] {
     {
       fieldName: 'questionnaires',
       label: '问卷列表',
-      // rules: 'required',
-      component: 'Select',
+      rules: 'required',
+      component: 'EditTable',
       componentProps: {
         placeholder: '请选择问卷',
-        // api: async () => {
-        //   const res = await getAvailableQuestionnaires();
-        //   console.info('获取问卷列表', res);
-        // },
       },
     },
     {
@@ -274,7 +270,7 @@ export function useAssessmentGridColumns(
     {
       field: 'operation',
       title: '操作',
-      minWidth: 130,
+      minWidth: 180,
       align: 'center',
       fixed: 'right', // 固定在右侧
       showOverflow: false, // 不显示溢出内容的省略号
@@ -286,6 +282,11 @@ export function useAssessmentGridColumns(
         },
         name: 'CellOperation',
         options: [
+          {
+            code: 'view',
+            show: true,
+            text: '查看',
+          },
           {
             code: 'edit',
             show: true,
