@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { VbenAvatar } from '@vben-core/shadcn-ui';
+
 interface Props {
   /**
    * @zh_CN 是否收起文本
@@ -51,19 +53,18 @@ withDefaults(defineProps<Props>(), {
       :href="href"
       class="flex h-full items-center gap-2 overflow-hidden px-3 text-lg leading-normal transition-all duration-500"
     >
-      <!-- <VbenAvatar
+      <VbenAvatar
         v-if="src"
         :alt="text"
         :src="src"
         :size="logoSize"
         :fit="fit"
         class="relative rounded-none bg-transparent"
-      /> -->
+      />
       <template v-if="!collapsed">
         <slot name="text">
           <span class="text-foreground truncate text-nowrap font-semibold">
-            <!-- {{ text }} -->
-            成都康培助残公益服务中心
+            {{ text }}
           </span>
         </slot>
       </template>
