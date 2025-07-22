@@ -92,12 +92,14 @@ export const getStatusColor = (
 
 // 获取类型标签
 export const getTypeLabel = (
-  type: number,
+  type: number | string,
   category: 'assessment' | 'questionnaire',
 ) => {
   const options =
     category === 'assessment'
       ? ASSESSMENT_TYPE_OPTIONS
       : QUESTIONNAIRE_TYPE_OPTIONS;
-  return options.find((item) => item.value === type)?.label || '未知类型';
+  return (
+    options.find((item) => item.value === Number(type))?.label || '未知类型'
+  );
 };
