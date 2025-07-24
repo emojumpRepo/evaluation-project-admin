@@ -24,6 +24,10 @@ import { notification } from 'ant-design-vue';
 import { Tinymce as RichTextarea } from '#/components/tinymce';
 import { FileUpload, ImageUpload } from '#/components/upload';
 
+const EditTable = defineAsyncComponent(
+  () => import('#/views/evaluation/assessment/components/edit-table.vue'),
+);
+
 const AutoComplete = defineAsyncComponent(
   () => import('ant-design-vue/es/auto-complete'),
 );
@@ -123,6 +127,7 @@ export type ComponentType =
   | 'InputPassword'
   | 'Mentions'
   | 'PrimaryButton'
+  | 'EditTable'
   | 'Radio'
   | 'RadioGroup'
   | 'RangePicker'
@@ -206,6 +211,7 @@ async function initComponentAdapter() {
     Upload,
     FileUpload,
     ImageUpload,
+    EditTable,
   };
 
   // 将组件注册到全局共享状态中

@@ -63,7 +63,7 @@ const defaultPreferences: Preferences = {
   logo: {
     enable: true,
     fit: 'contain',
-    source: 'https://unpkg.com/@vbenjs/static-source@0.1.7/source/logo-v1.webp',
+    source: 'http://test.yudao.iocoder.cn/user/avatar/20250722/J8FI9wd39tIt5d491c8bfc89f56abdf9a71a8e9011e1_1753171919801.png',
   },
   navigation: {
     accordion: true,
@@ -112,7 +112,7 @@ const defaultPreferences: Preferences = {
     colorPrimary: 'hsl(212 100% 45%)',
     colorSuccess: 'hsl(144 57% 58%)',
     colorWarning: 'hsl(42 84% 61%)',
-    mode: 'dark',
+    mode: 'light',
     radius: '0.5',
     semiDarkHeader: false,
     semiDarkSidebar: false,
