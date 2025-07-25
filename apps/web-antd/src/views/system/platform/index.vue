@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { VbenFormSchema } from '@vben/common-ui';
+
 import type { Carousel, Policy } from './types';
 
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 
@@ -35,59 +37,116 @@ const activePolicyTab = ref('service');
 const banners = ref<Carousel[]>([]);
 
 // 轮播图操作表单配置
-const bannerModalFormSchema = [
-  {
-    fieldName: 'id',
-    component: 'Input',
-    label: 'ID',
-    componentProps: { disabled: true },
-    show: false,
-  },
-  { fieldName: 'title', component: 'Input', label: '标题', rules: 'required' },
-  {
-    fieldName: 'imageUrl',
-    component: 'ImageUpload',
-    label: '轮播图',
-    rules: 'required',
-    componentProps: {
-      maxNumber: 1,
-      maxSize: 5,
-      accept: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
-      showDescription: true,
-      listType: 'picture-card',
-      resultField: 'url',
-      // 自定义上传接口，可以在这里处理上传逻辑
-      api: async (file: File) => {
-        const { httpRequest } = useUpload();
-        const res = await httpRequest(file);
-        console.warn('res', res);
-        return res;
+const bannerModalFormSchema = computed((): VbenFormSchema[] => {
+  return [
+    {
+      fieldName: 'id',
+      component: 'Input',
+      label: 'ID',
+      componentProps: { disabled: true },
+      dependencies: {
+        triggerFields: [''],
+        show: () => false,
       },
     },
-  },
-  { fieldName: 'linkUrl', component: 'Input', label: '跳转链接' },
-  {
-    fieldName: 'sort',
-    component: 'InputNumber',
-    label: '排序',
-    rules: 'required',
-    componentProps: { min: 1 },
-  },
-  {
-    fieldName: 'status',
-    component: 'RadioGroup',
-    label: '状态',
-    componentProps: {
-      options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
-      buttonStyle: 'solid',
-      optionType: 'button',
+    {
+      fieldName: 'title',
+      component: 'Input',
+      label: '标题',
+      rules: 'required',
     },
-    rules: 'required',
-  },
-];
+    { fieldName: 'subtitle', component: 'Input', label: '副标题' },
+    {
+      fieldName: 'type',
+      component: 'RadioGroup',
+      label: '类型',
+      componentProps: {
+        options: [
+          { label: '跳转链接', value: 1 },
+          { label: '弹窗', value: 2 },
+        ],
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+      rules: 'required',
+    },
+    {
+      fieldName: 'imageUrl',
+      component: 'ImageUpload',
+      label: '轮播图',
+      rules: 'required',
+      componentProps: {
+        maxNumber: 1,
+        maxSize: 5,
+        accept: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+        showDescription: true,
+        listType: 'picture-card',
+        resultField: 'url',
+        // 自定义上传接口，可以在这里处理上传逻辑
+        api: async (file: File) => {
+          const { httpRequest } = useUpload();
+          const res = await httpRequest(file);
+          console.warn('res', res);
+          return res;
+        },
+      },
+    },
+    {
+      fieldName: 'linkUrl',
+      component: 'Input',
+      label: '跳转链接',
+      dependencies: {
+        triggerFields: ['type'],
+        show: (values) => values.type === 1,
+        trigger: (values) => {
+          if (values.type === 1) {
+            values.linkUrl = '';
+          }
+        },
+        required: (values) => values.type === 1,
+      },
+    },
+    {
+      fieldName: 'popupContent',
+      component: 'Textarea',
+      label: '弹窗内容',
+      dependencies: {
+        triggerFields: ['type'],
+        show: (values) => values.type === 2,
+        trigger: (values) => {
+          if (values.type === 2) {
+            values.popupContent = '';
+          }
+        },
+        required: (values) => values.type === 2,
+      },
+      componentProps: {
+        height: 400,
+      },
+    },
+    {
+      fieldName: 'sort',
+      component: 'InputNumber',
+      label: '排序',
+      rules: 'required',
+      componentProps: { min: 1 },
+    },
+    {
+      fieldName: 'status',
+      component: 'RadioGroup',
+      label: '状态',
+      componentProps: {
+        options: getDictOptions(DICT_TYPE.COMMON_STATUS, 'number'),
+        buttonStyle: 'solid',
+        optionType: 'button',
+      },
+      rules: 'required',
+    },
+  ];
+});
 
 const [BannerForm, bannerFormApi] = useVbenForm({
-  schema: bannerModalFormSchema,
+  schema: bannerModalFormSchema.value,
   showDefaultActions: false,
 });
 const [BannerModal, bannerModalApi] = useVbenModal({
@@ -119,7 +178,7 @@ const [BannerModal, bannerModalApi] = useVbenModal({
           bannerFormApi.setValues(res);
         });
       } else {
-        bannerFormApi.setValues({ status: 0 });
+        bannerFormApi.setValues({ status: 0, type: 1 });
       }
     }
   },
@@ -130,6 +189,7 @@ const bannerColumns = [
   { field: 'id', title: 'ID', width: 100 },
   { field: 'sort', title: '排序', width: 120 },
   { field: 'title', title: '标题' },
+  { field: 'subtitle', title: '副标题' },
   { field: 'imageUrl', title: '图片', cellRender: { name: 'CellImage' } },
   { field: 'linkUrl', title: '跳转链接', showOverflow: true },
   {

@@ -10,9 +10,27 @@ export interface BaseCarousel {
   status: number; // 状态
 }
 
+// 轮播图表单值类型
+export interface CarouselFormValues {
+  id?: number; // 轮播图ID (编辑时存在)
+  title: string; // 标题
+  subtitle?: string; // 副标题
+  type: number; // 类型：1-跳转链接, 2-弹窗
+  imageUrl: string; // 图片路径
+  linkUrl?: string; // 跳转链接 (type=1时)
+  popupContent?: string; // 弹窗内容 (type=2时)
+  sort: number; // 排序
+  status: number; // 状态
+  remark?: string; // 备注
+  createTime?: string; // 创建时间
+}
+
 export interface Carousel extends BaseCarousel {
   id: number; // 轮播图ID
   createTime: string; // 创建时间
+  subtitle?: string; // 副标题
+  type: number; // 类型：1-跳转链接, 2-弹窗
+  popupContent?: string; // 弹窗内容
 }
 
 export interface CarouselList {
