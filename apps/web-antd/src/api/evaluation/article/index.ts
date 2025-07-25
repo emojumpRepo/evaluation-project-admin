@@ -37,9 +37,23 @@ export const ARTICLE_CATEGORY_OPTIONS = [
   },
 ];
 
+export const ARTICLE_STATUS_OPTIONS = [
+  { label: '草稿', value: 0 },
+  { label: '发布', value: 1 },
+  { label: '下架', value: 2 },
+];
+
+/** 获取文章类型标签 */
 export const getArticleCategoryLabel = (value: string) => {
   return ARTICLE_CATEGORY_OPTIONS.find((item) => item.value === value)?.label;
 };
+
+/** 获取文章状态标签 */
+export const getArticleStatusLabel = (value: number) => {
+  return ARTICLE_STATUS_OPTIONS.find((item) => item.value === value)?.label;
+};
+
+// ========================= API =========================
 
 /** 查询文章列表 */
 export function getArticleList(params: PageParam) {

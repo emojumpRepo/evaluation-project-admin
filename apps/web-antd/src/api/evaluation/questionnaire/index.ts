@@ -29,6 +29,31 @@ export interface QuestionnairePageReqVO {
   createTime?: string[];
 }
 
+export interface QuestionnaireResultVO {
+  id?: number;
+  assessmentResultId?: number;
+  assessmentId?: number;
+  babyId?: number;
+  questionnaireId?: number;
+  resultData?: string;
+  answerData?: string;
+  score?: number;
+  level?: number;
+  completionTime?: string;
+}
+
+export interface QuestionnaireResultPageReqVO {
+  pageNo?: number;
+  pageSize?: number;
+  assessmentResultId?: number;
+  assessmentId?: number;
+  babyId?: number;
+  questionnaireId?: number;
+  level?: string;
+  completionTime?: string[];
+  createTime?: string[];
+}
+
 // 创建问卷
 export const createQuestionnaire = (data: QuestionnaireVO) => {
   return requestClient.post('/emojump/questionnaire/create', data);
@@ -87,4 +112,14 @@ export const testQuestionnaireLink = (id: number) => {
 // 同步最新问卷数据
 export const syncQuestionnaireData = () => {
   return requestClient.post('/emojump/questionnaire-sync/manual-sync');
+};
+
+// =============== 问卷结果 ===============
+export const getQuestionnaireResultList = (
+  params: QuestionnaireResultPageReqVO,
+) => {
+  return requestClient.get<{
+    list: QuestionnaireResultVO[];
+    total: number;
+  }>('/emojump/questionnaire-result/page', { params });
 };

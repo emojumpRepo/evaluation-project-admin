@@ -23,7 +23,7 @@ export function useQuestionFormSchema(): VbenFormSchema[] {
       label: '问卷标题',
       component: 'Input',
       rules: 'required',
-      disabled: true,
+      // disabled: true,
       componentProps: {
         placeholder: '请输入问卷标题',
       },
@@ -38,7 +38,7 @@ export function useQuestionFormSchema(): VbenFormSchema[] {
       label: '问卷链接',
       component: 'Input',
       rules: 'required',
-      disabled: true,
+      // disabled: true,
       componentProps: {
         placeholder: '请输入问卷链接',
       },
@@ -266,26 +266,86 @@ export function useQuestionGridColumns() {
 
 // =============== 问卷结果配置 ====================
 
-// export function useQuestionnaireResultGridFormSchema(
-//   onActionClick?: OnActionClickFn<>,
-// ) {
+export function useQuestionnaireResultGridFormSchema() {
+  return [
+    {
+      fieldName: 'assessmentId',
+      label: '测评ID',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入测评ID',
+        allowClear: true,
+      },
+    },
+    {
+      fieldName: 'questionnaireId',
+      label: '问卷ID',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入问卷ID',
+        allowClear: true,
+      },
+    },
+    {
+      fieldName: 'babyId',
+      label: '宝宝ID',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入宝宝ID',
+        allowClear: true,
+      },
+    },
+  ];
+}
 
-// }
-
-// export function useQuestionnaireResultGridColumns(
-//   onActionClick?: OnActionClickFn<QuestionnaireResultRespVO>,
-// ) {
-//   return [
-//     {
-//       title: '问卷标题',
-//       dataIndex: 'questionnaireTitle',
-//       width: 200,
-//     },
-//     {
-//       title: '用户名称',
-//       dataIndex: 'userName',
-//       width: 100,
-//     },
-//     {}
-//   ]
-// }
+export function useQuestionnaireResultGridColumns() {
+  return [
+    {
+      title: '编号',
+      field: 'id',
+      width: 70,
+    },
+    {
+      title: '测评ID',
+      field: 'assessmentId',
+    },
+    {
+      title: '宝宝ID',
+      field: 'babyId',
+    },
+    {
+      title: '问卷ID',
+      field: 'questionnaireId',
+    },
+    {
+      title: '问卷结果',
+      field: 'resultData',
+    },
+    {
+      title: '回答答案',
+      field: 'answerData',
+    },
+    {
+      title: '问卷得分',
+      field: 'score',
+      slots: { default: 'score' },
+    },
+    {
+      title: '问卷评级',
+      field: 'level',
+      slots: { default: 'level' },
+    },
+    {
+      title: '完成时间',
+      field: 'completedTime',
+      formatter: 'formatDateTime',
+    },
+    {
+      title: '操作',
+      fixed: 'right',
+      field: 'actions',
+      width: 100,
+      slots: { default: 'actions' },
+    },
+  ];
+}
