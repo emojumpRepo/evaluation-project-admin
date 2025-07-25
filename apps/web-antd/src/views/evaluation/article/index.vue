@@ -18,7 +18,7 @@ import {
 } from '#/api/evaluation/article';
 import { $t } from '#/locales';
 
-import { useGridColumns } from './data';
+import { useGridColumns, useGridFormSchema } from './data';
 import editForm from './modules/edit-form.vue';
 
 /** 设置选中 ID */
@@ -83,6 +83,9 @@ function onRefresh() {
 
 // 表格实例
 const [Grid, gridApi] = useVbenVxeGrid({
+  formOptions: {
+    schema: useGridFormSchema(),
+  },
   gridOptions: {
     columns: useGridColumns(),
     checkboxConfig: {
@@ -93,10 +96,11 @@ const [Grid, gridApi] = useVbenVxeGrid({
     keepSource: true,
     proxyConfig: {
       ajax: {
-        query: async ({ page }) => {
+        query: async ({ page }, formValues) => {
           return await getArticleList({
             pageNo: page.currentPage,
             pageSize: page.pageSize,
+            ...formValues,
           });
         },
       },

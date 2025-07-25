@@ -27,7 +27,6 @@ import { $t } from '#/locales';
 
 import { useAssessmentGridColumns, useAssessmentGridFormSchema } from './data';
 import Form from './modules/add-form.vue';
-import ResultList from './modules/result-list.vue';
 
 /** 子表的列表 */
 const selectAssessment = ref<AssessmentVO>();
@@ -112,7 +111,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
   },
   gridOptions: {
     columns: useAssessmentGridColumns(onActionClick),
-    height: '600px',
+    height: 'auto',
     pagerConfig: {
       enabled: true,
     },
@@ -157,45 +156,45 @@ onMounted(() => {
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
 
-    <div class="flex flex-col gap-10">
-      <Grid table-title="测评列表">
-        <template #toolbar-tools>
-          <Button :icon="h(Plus)" type="primary" @click="onCreate">
-            {{ $t('ui.actionTitle.create', ['测评']) }}
-          </Button>
-        </template>
+    <!-- <div class="flex flex-col gap-10"> -->
+    <Grid table-title="测评管理">
+      <template #toolbar-tools>
+        <Button :icon="h(Plus)" type="primary" @click="onCreate">
+          {{ $t('ui.actionTitle.create', ['测评']) }}
+        </Button>
+      </template>
 
-        <!-- 测评类型 -->
-        <template #type="{ row }">
-          <Tag color="blue">
-            {{ getTypeLabel(row.type, 'assessment') }}
-          </Tag>
-        </template>
+      <!-- 测评类型 -->
+      <template #type="{ row }">
+        <Tag color="blue">
+          {{ getTypeLabel(row.type, 'assessment') }}
+        </Tag>
+      </template>
 
-        <!-- 测评状态 -->
-        <template #status="{ row }">
-          <Tag :color="getStatusColor(row.status, 'assessment')">
-            {{ getStatusLabel(row.status, 'assessment') }}
-          </Tag>
-        </template>
+      <!-- 测评状态 -->
+      <template #status="{ row }">
+        <Tag :color="getStatusColor(row.status, 'assessment')">
+          {{ getStatusLabel(row.status, 'assessment') }}
+        </Tag>
+      </template>
 
-        <!-- 是否需要预约 -->
-        <template #needAppointment="{ row }">
-          <Tag :color="row.needAppointment ? 'blue' : 'red'">
-            {{ row.needAppointment ? '是' : '否' }}
-          </Tag>
-        </template>
+      <!-- 是否需要预约 -->
+      <template #needAppointment="{ row }">
+        <Tag :color="row.needAppointment ? 'blue' : 'red'">
+          {{ row.needAppointment ? '是' : '否' }}
+        </Tag>
+      </template>
 
-        <!-- 是否可重复测评 -->
-        <template #isRepeatable="{ row }">
-          <Tag :color="row.isRepeatable ? 'green' : 'red'">
-            {{ row.isRepeatable ? '是' : '否' }}
-          </Tag>
-        </template>
-      </Grid>
+      <!-- 是否可重复测评 -->
+      <template #isRepeatable="{ row }">
+        <Tag :color="row.isRepeatable ? 'green' : 'red'">
+          {{ row.isRepeatable ? '是' : '否' }}
+        </Tag>
+      </template>
+    </Grid>
 
-      <!-- 子表的表单 -->
-      <ResultList :id="selectAssessment?.id" />
-    </div>
+    <!-- 子表的表单 -->
+    <!-- <ResultList :id="selectAssessment?.id" /> -->
+    <!-- </div> -->
   </Page>
 </template>

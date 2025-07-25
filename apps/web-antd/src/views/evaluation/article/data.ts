@@ -3,7 +3,10 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import dayjs from 'dayjs';
 
-import { ARTICLE_CATEGORY_OPTIONS } from '#/api/evaluation/article';
+import {
+  ARTICLE_CATEGORY_OPTIONS,
+  ARTICLE_STATUS_OPTIONS,
+} from '#/api/evaluation/article';
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -68,10 +71,29 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'RadioGroup',
       defaultValue: 1,
       componentProps: {
-        options: [
-          { label: '发布', value: 1 },
-          { label: '下架', value: 0 },
-        ],
+        options: ARTICLE_STATUS_OPTIONS,
+      },
+    },
+  ];
+}
+
+/** 列表的搜索表单 */
+export function useGridFormSchema(): VbenFormSchema[] {
+  return [
+    {
+      fieldName: 'category',
+      label: '文章类型',
+      component: 'Select',
+      componentProps: {
+        options: ARTICLE_CATEGORY_OPTIONS,
+      },
+    },
+    {
+      fieldName: 'status',
+      label: '发布状态',
+      component: 'Select',
+      componentProps: {
+        options: ARTICLE_STATUS_OPTIONS,
       },
     },
   ];
