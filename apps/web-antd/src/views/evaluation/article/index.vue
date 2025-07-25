@@ -2,7 +2,7 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { EmojumpArticleApi } from '#/api/evaluation/article';
 
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 import { Page, useVbenModal } from '@vben/common-ui';
 import { isEmpty } from '@vben/utils';
@@ -13,6 +13,7 @@ import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   deleteArticle,
   deleteArticleBatch,
+  getArticleCategoryLabel,
   getArticleList,
 } from '#/api/evaluation/article';
 import { $t } from '#/locales';
@@ -100,6 +101,9 @@ const [Grid, gridApi] = useVbenVxeGrid({
         },
       },
     },
+    sortConfig: {
+      defaultSort: { field: 'id', order: 'desc' },
+    },
     rowConfig: {
       keyField: 'id',
     },
@@ -114,6 +118,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
     checkboxAll: setCheckedIds,
     checkboxChange: setCheckedIds,
   },
+});
+
+onMounted(async () => {
+  await gridApi.query();
 });
 </script>
 
@@ -152,6 +160,12 @@ const [Grid, gridApi] = useVbenVxeGrid({
       <template #status="{ row }">
         <Tag :color="row.status === 1 ? 'success' : 'warning'">
           {{ row.status === 1 ? '已发布' : '未发布' }}
+        </Tag>
+      </template>
+
+      <template #category="{ row }">
+        <Tag color="blue">
+          {{ getArticleCategoryLabel(row.category) }}
         </Tag>
       </template>
 

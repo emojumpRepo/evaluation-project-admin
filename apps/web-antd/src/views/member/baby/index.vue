@@ -2,6 +2,8 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MemberBabyApi } from '#/api/member/baby';
 
+import { onMounted } from 'vue';
+
 import { Page } from '@vben/common-ui';
 
 import { useVbenVxeGrid } from '#/adapter/vxe-table';
@@ -10,7 +12,7 @@ import { getBabyList } from '#/api/member/baby';
 import { useGridColumns, useGridFormSchema } from './data';
 
 // 表格实例
-const [Grid] = useVbenVxeGrid({
+const [Grid, gridApi] = useVbenVxeGrid({
   formOptions: {
     schema: useGridFormSchema(),
   },
@@ -41,6 +43,10 @@ const [Grid] = useVbenVxeGrid({
       search: true,
     },
   } as VxeTableGridOptions<MemberBabyApi.Baby>,
+});
+
+onMounted(async () => {
+  await gridApi.query();
 });
 </script>
 

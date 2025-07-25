@@ -63,7 +63,8 @@ const defaultPreferences: Preferences = {
   logo: {
     enable: true,
     fit: 'contain',
-    source: 'http://test.yudao.iocoder.cn/user/avatar/20250722/J8FI9wd39tIt5d491c8bfc89f56abdf9a71a8e9011e1_1753171919801.png',
+    source:
+      'http://test.yudao.iocoder.cn/user/avatar/20250722/J8FI9wd39tIt5d491c8bfc89f56abdf9a71a8e9011e1_1753171919801.png',
   },
   navigation: {
     accordion: true,

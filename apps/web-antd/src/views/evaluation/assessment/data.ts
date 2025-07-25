@@ -108,6 +108,17 @@ export function useAssessmentFormSchema(): VbenFormSchema[] {
       },
     },
     {
+      fieldName: 'isRepeatable',
+      label: '是否可重复测评',
+      component: 'RadioGroup',
+      componentProps: {
+        options: [
+          { label: '是', value: true },
+          { label: '否', value: false },
+        ],
+      },
+    },
+    {
       fieldName: 'maxParticipants',
       label: '最大参与人数',
       component: 'InputNumber',
@@ -123,15 +134,15 @@ export function useAssessmentFormSchema(): VbenFormSchema[] {
         placeholder: '请输入备注',
       },
     },
-    {
-      fieldName: 'status',
-      label: '状态',
-      rules: 'required',
-      component: 'Select',
-      componentProps: {
-        options: ASSESSMENT_STATUS_OPTIONS,
-      },
-    },
+    // {
+    //   fieldName: 'status',
+    //   label: '状态',
+    //   rules: 'required',
+    //   component: 'Select',
+    //   componentProps: {
+    //     options: ASSESSMENT_STATUS_OPTIONS,
+    //   },
+    // },
   ];
 }
 
@@ -244,6 +255,14 @@ export function useAssessmentGridColumns(
       title: '是否需要预约',
       slots: {
         default: 'needAppointment',
+      },
+    },
+    {
+      field: 'isRepeatable',
+      minWidth: 120,
+      title: '是否可重复测评',
+      slots: {
+        default: 'isRepeatable',
       },
     },
     {

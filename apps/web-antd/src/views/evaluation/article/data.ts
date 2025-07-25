@@ -3,35 +3,7 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
 import dayjs from 'dayjs';
 
-const categoryType = [
-  {
-    label: '心理健康',
-    value: 'psychology',
-  },
-  {
-    label: '发育指导',
-    value: 'guide',
-  },
-  {
-    label: '家庭',
-    value: 'family',
-  },
-];
-
-// export function useGridFormSchema(): VbenFormSchema[] {
-//   return [
-//     {
-//       fieldName: 'name',
-//       label: '文章标题',
-//       component: 'Input',
-//     },
-//     {
-//       fieldName: 'mobile',
-//       label: '监护人手机号',
-//       component: 'Input',
-//     },
-//   ];
-// }
+import { ARTICLE_CATEGORY_OPTIONS } from '#/api/evaluation/article';
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -76,7 +48,7 @@ export function useFormSchema(): VbenFormSchema[] {
       rules: 'required',
       component: 'Select',
       componentProps: {
-        options: categoryType,
+        options: ARTICLE_CATEGORY_OPTIONS,
       },
     },
     {
@@ -136,6 +108,7 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
     {
       field: 'category',
       title: '分类',
+      slots: { default: 'category' },
     },
     {
       field: 'viewCount',
