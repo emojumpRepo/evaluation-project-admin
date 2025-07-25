@@ -382,7 +382,8 @@ function handleEditAgreement(type: string) {
     .open();
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await GridApi.query();
   fetchAgreements();
 });
 </script>

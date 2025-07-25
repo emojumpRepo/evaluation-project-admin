@@ -21,6 +21,7 @@ export interface AssessmentVO {
   startTime?: number | string;
   endTime?: number | string;
   needAppointment?: boolean;
+  isRepeatable?: boolean;
   maxParticipants?: number;
   currentParticipants?: number;
   remark?: string;
@@ -54,7 +55,7 @@ export interface AssessmentResultPageReqVO {
   pageNo?: number;
   pageSize?: number;
   assessmentId?: number;
-  userId?: number;
+  babyId?: number;
   status?: number;
   completedTime?: string[];
 }
@@ -74,8 +75,8 @@ export interface AssessmentResultRespVO {
   id?: number;
   assessmentId: number;
   assessmentTitle: string;
-  userId: number;
-  userName: string;
+  babyId: number;
+  babyName: string;
   overallScore: number;
   overallLevel: string;
   overallReport: string;

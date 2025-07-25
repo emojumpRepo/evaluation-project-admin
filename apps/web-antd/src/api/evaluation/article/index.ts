@@ -18,6 +18,29 @@ export namespace EmojumpArticleApi {
   }
 }
 
+export const ARTICLE_CATEGORY_OPTIONS = [
+  {
+    label: '儿童发展与干预',
+    value: '1',
+  },
+  {
+    label: '儿童精神健康',
+    value: '2',
+  },
+  {
+    label: '膳食与健康',
+    value: '3',
+  },
+  {
+    label: '心理健康与生活方式',
+    value: '4',
+  },
+];
+
+export const getArticleCategoryLabel = (value: string) => {
+  return ARTICLE_CATEGORY_OPTIONS.find((item) => item.value === value)?.label;
+};
+
 /** 查询文章列表 */
 export function getArticleList(params: PageParam) {
   return requestClient.get<PageResult<EmojumpArticleApi.Article>>(

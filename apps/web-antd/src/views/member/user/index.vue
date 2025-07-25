@@ -2,7 +2,7 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { MemberUserApi } from '#/api/member/user';
 
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
@@ -121,6 +121,10 @@ const [Grid, gridApi] = useVbenVxeGrid({
     checkboxAll: setCheckedIds,
     checkboxChange: setCheckedIds,
   },
+});
+
+onMounted(async () => {
+  await gridApi.query();
 });
 </script>
 

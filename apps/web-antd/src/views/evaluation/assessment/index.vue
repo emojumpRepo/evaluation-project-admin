@@ -185,6 +185,13 @@ onMounted(() => {
             {{ row.needAppointment ? '是' : '否' }}
           </Tag>
         </template>
+
+        <!-- 是否可重复测评 -->
+        <template #isRepeatable="{ row }">
+          <Tag :color="row.isRepeatable ? 'green' : 'red'">
+            {{ row.isRepeatable ? '是' : '否' }}
+          </Tag>
+        </template>
       </Grid>
 
       <!-- 子表的表单 -->
