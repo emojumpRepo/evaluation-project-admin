@@ -123,3 +123,10 @@ export const getQuestionnaireResultList = (
     total: number;
   }>('/emojump/questionnaire-result/page', { params });
 };
+
+// 获取问卷结果
+export const getQuestionnaireResult = (id: number) => {
+  return requestClient.get<QuestionnaireResultVO>(
+    `/emojump/questionnaire-result/get?id=${id}`,
+  );
+};

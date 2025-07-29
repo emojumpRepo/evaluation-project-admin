@@ -103,3 +103,116 @@ export const getTypeLabel = (
     options.find((item) => item.value === Number(type))?.label || '未知类型'
   );
 };
+
+// =============== 问卷结果等级样式 ===============
+
+export const LEVEL_COLOR_MAP: Record<
+  string,
+  { bg: string; color: string; icon: string; progressColor: string }
+> = {
+  正常范围: {
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    icon: '🟢',
+    progressColor: '#10b981',
+  },
+  可能抑郁: {
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    icon: '🔴',
+    progressColor: '#f87171',
+  },
+  需要提升: {
+    color: 'text-orange-600',
+    bg: 'bg-orange-50',
+    icon: '⚠️',
+    progressColor: '#fb923c',
+  },
+  需关注: {
+    color: 'text-orange-600',
+    bg: 'bg-orange-50',
+    icon: '⚠️',
+    progressColor: '#fb923c',
+  },
+  明显: {
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    icon: '🔴',
+    progressColor: '#f87171',
+  },
+  一般: {
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    icon: '🟡',
+    progressColor: '#fbbf24',
+  },
+  正常: {
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    icon: '🟢',
+    progressColor: '#10b981',
+  },
+  优秀: {
+    color: 'text-green-600',
+    bg: 'bg-green-50',
+    icon: '🟢',
+    progressColor: '#34d399',
+  },
+  低风险: {
+    color: 'text-blue-600',
+    bg: 'bg-blue-50',
+    icon: '🟢',
+    progressColor: '#60a5fa',
+  },
+  中度风险: {
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    icon: '🟡',
+    progressColor: '#fbbf24',
+  },
+  高风险: {
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    icon: '🔴',
+    progressColor: '#f87171',
+  },
+  严重: {
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    icon: '🔴',
+    progressColor: '#ef4444',
+  },
+  中等: {
+    color: 'text-yellow-600',
+    bg: 'bg-yellow-50',
+    icon: '🟡',
+    progressColor: '#fbbf24',
+  },
+  不足: {
+    color: 'text-red-600',
+    bg: 'bg-red-50',
+    icon: '🔴',
+    progressColor: '#ef4444',
+  },
+};
+
+export type LevelType = 'bg' | 'color' | 'icon' | 'progressColor';
+
+// 获取等级样式
+export function getLevelClass(
+  level: string,
+  type: LevelType | LevelType[],
+): string {
+  const info = LEVEL_COLOR_MAP[level] || {
+    color: 'text-gray-600',
+    bg: 'bg-gray-50',
+    icon: '📊',
+    progressColor: '#1677ff',
+  };
+  return Array.isArray(type)
+    ? type
+        .map((t) => info[t] || '')
+        .filter(Boolean)
+        .join(' ')
+    : info[type] || '';
+}

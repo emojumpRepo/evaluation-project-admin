@@ -15,21 +15,26 @@ import {
   useQuestionnaireResultGridColumns,
   useQuestionnaireResultGridFormSchema,
 } from '../data';
+import ResultModel from './result-model.vue';
 
 const props = defineProps<{
   id?: number; // 测评编号（主表的关联字段）
 }>();
 
 /** 测评结果弹窗 */
-const [ResultModel] = useVbenModal({
+const [Modal, modalApi] = useVbenModal({
   header: false,
   footer: false,
   fullscreenButton: false,
+  connectedComponent: ResultModel,
 });
 
 const onGet = (row: QuestionnaireResultVO) => {
-  // console.log('查看问卷详情', row);
-  return row;
+  modalApi
+    .setData({
+      id: row.id,
+    })
+    .open();
 };
 
 /** 表格 */
@@ -77,17 +82,6 @@ const onRefresh = async () => {
   await gridApi.query();
 };
 
-/** 监听主表的关联字段的变化，加载对应的子表数据 */
-// watch(
-//   () => props.id,
-//   async (val) => {
-//     if (!val) {
-//       return;
-//     }
-//     await onRefresh();
-//   },
-// );
-
 onMounted(() => {
   onRefresh();
 });
@@ -118,7 +112,5 @@ onMounted(() => {
   </Grid>
 
   <!-- 测评结果弹窗 -->
-  <ResultModel class="w-[600px]">
-    <div>测评结果</div>
-  </ResultModel>
+  <Modal class="w-[800px]" />
 </template>
