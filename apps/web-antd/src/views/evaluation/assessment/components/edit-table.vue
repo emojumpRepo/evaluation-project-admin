@@ -63,11 +63,14 @@ watch(
         ? newValue.map((item, index) => {
             const normalizedItem: DataItem = {
               key: `${index + 1}`,
-              questionnaireId: item.questionnaireId,
-              sortOrder: item.sortOrder || index + 1,
+              questionnaireId: Math.max(
+                1,
+                Math.floor(Number(item.questionnaireId) || 1),
+              ),
+              sortOrder: Math.max(1, Math.floor(item.sortOrder || index + 1)),
               isRequired:
-                item.isRequired === undefined ? true : item.isRequired,
-              weight: item.weight || 0,
+                item.isRequired === undefined ? true : Boolean(item.isRequired),
+              weight: Math.max(0, Number(item.weight) || 0),
             };
             return normalizedItem;
           })
@@ -79,7 +82,7 @@ watch(
 // 同步数据到父组件的函数
 const syncToParent = () => {
   isInternalUpdate = true;
-  const result = dataSource.value.map(({ key, ...item }) => item);
+  const result = dataSource.value.map(({ key: _key, ...item }) => item);
   emit('update:tableList', result);
   nextTick(() => {
     isInternalUpdate = false;
@@ -121,7 +124,16 @@ const edit = (
 
   const cellKey = getCellKey(rowKey, columnKey);
   editingCell.value = cellKey;
-  editingValue.value = Number(currentValue) || 0;
+
+  // 确保currentValue是合法的数值
+  let numValue = 0;
+  if (typeof currentValue === 'number') {
+    numValue = currentValue;
+  } else if (typeof currentValue === 'string') {
+    const parsed = Number(currentValue);
+    numValue = Number.isNaN(parsed) ? 0 : parsed;
+  }
+  editingValue.value = numValue;
 
   // 下一个tick聚焦到输入框
   nextTick(() => {
@@ -139,13 +151,31 @@ const edit = (
 const save = (rowKey: string, columnKey: string) => {
   const item = dataSource.value.find((item) => item.key === rowKey);
   if (item && editingCell.value) {
-    // 根据字段类型进行适当的类型转换
+    // 根据字段类型进行适当的类型转换和验证
     let value: any = editingValue.value;
-    if (columnKey === 'questionnaireId' || columnKey === 'sortOrder') {
-      value = Number(value) || 0;
-    } else if (columnKey === 'weight') {
-      value = Number(value) || 0;
+
+    switch (columnKey) {
+      case 'questionnaireId': {
+        // 问卷ID必须是正整数
+        value = Math.max(1, Math.floor(Number(value) || 1));
+
+        break;
+      }
+      case 'sortOrder': {
+        // 排序必须是正整数
+        value = Math.max(1, Math.floor(Number(value) || 1));
+
+        break;
+      }
+      case 'weight': {
+        // 权重可以是小数，但不能为负数
+        value = Math.max(0, Number(value) || 0);
+
+        break;
+      }
+      // No default
     }
+
     (item as any)[columnKey] = value;
     // 同步到父组件
     syncToParent();
@@ -169,14 +199,14 @@ const isEditing = (rowKey: string, columnKey: string) => {
  * @param columnKey 列键
  */
 const handleBlur = (rowKey: string, columnKey: string) => {
-  // 使用 setTimeout 确保失焦事件正确处理，但要检查是否还在编辑同一个单元格
+  // 使用较短的延迟时间确保失焦事件正确处理
   setTimeout(() => {
     const currentCellKey = getCellKey(rowKey, columnKey);
     // 只有当前仍在编辑这个单元格时才保存（避免被其他点击事件覆盖）
     if (editingCell.value === currentCellKey) {
       save(rowKey, columnKey);
     }
-  }, 150);
+  }, 100);
 };
 
 /**
@@ -184,6 +214,12 @@ const handleBlur = (rowKey: string, columnKey: string) => {
  * @param key 行键
  */
 const onDelete = (key: string) => {
+  // 如果正在编辑的是要删除的行，清除编辑状态
+  if (editingCell.value && editingCell.value.startsWith(`${key}-`)) {
+    editingCell.value = '';
+    editingValue.value = 0;
+  }
+
   dataSource.value = dataSource.value.filter((item) => item.key !== key);
   syncToParent();
 };
@@ -200,10 +236,21 @@ const handleSwitchChange = (rowKey: string, checked: any) => {
  * 添加行
  */
 const handleAdd = () => {
+  // 计算新的问卷ID，避免与现有数据冲突
+  const existingIds = dataSource.value.map((item) => item.questionnaireId);
+  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+
+  // 计算新的排序号，确保sortOrder始终有值
+  const existingSortOrders = dataSource.value
+    .map((item) => item.sortOrder)
+    .filter((order): order is number => order !== undefined);
+  const maxSortOrder =
+    existingSortOrders.length > 0 ? Math.max(...existingSortOrders) : 0;
+
   const newData: DataItem = {
     key: `${count.value}`,
-    questionnaireId: count.value,
-    sortOrder: count.value,
+    questionnaireId: maxId + 1,
+    sortOrder: maxSortOrder + 1,
     isRequired: true,
     weight: 0,
   };
@@ -239,7 +286,7 @@ const handleAdd = () => {
               ref="inputRef"
               :precision="column.dataIndex === 'weight' ? 2 : 0"
               :step="column.dataIndex === 'weight' ? 0.1 : 1"
-              :min="0"
+              :min="column.dataIndex === 'weight' ? 0 : 1"
             />
           </div>
           <div
