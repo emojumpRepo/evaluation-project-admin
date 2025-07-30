@@ -84,6 +84,11 @@ export const getQuestionnaireList = (params: QuestionnairePageReqVO) => {
   }>('/emojump/questionnaire/list', { params });
 };
 
+// 获取所有问卷列表
+export const getAllQuestionnaireList = () => {
+  return requestClient.get<QuestionnaireVO[]>('/emojump/questionnaire/all');
+};
+
 // 发布问卷
 export const publishQuestionnaire = (id: number) => {
   return requestClient.post(`/emojump/questionnaire/publish?id=${id}`);

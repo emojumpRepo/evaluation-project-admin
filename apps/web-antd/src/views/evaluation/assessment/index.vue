@@ -5,15 +5,14 @@ import type {
 } from '#/adapter/vxe-table';
 import type { AssessmentVO } from '#/api/evaluation/assessment/index';
 
-import { h, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 import { Page, useVbenModal } from '@vben/common-ui';
-import { Plus } from '@vben/icons';
 
-import { Button, message, Tag } from 'ant-design-vue';
+import { message, Tag } from 'ant-design-vue';
 
-import { useVbenVxeGrid } from '#/adapter/vxe-table';
+import { ACTION_ICON, TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
 import {
   deleteAssessment,
   getAssessmentList,
@@ -47,14 +46,6 @@ function onRefresh() {
 function onCreate() {
   formModalApi.setData({}).open();
 }
-
-/** 发布/取消发布测评 */
-// async function onPublish(row: AssessmentVO) {
-//   await (row.status === 1
-//     ? unpublishAssessment(row.id as number)
-//     : publishAssessment(row.id as number));
-//   onRefresh();
-// }
 
 /** 查看测评 */
 function onView(row: AssessmentVO) {
@@ -159,9 +150,16 @@ onMounted(() => {
     <!-- <div class="flex flex-col gap-10"> -->
     <Grid table-title="测评管理">
       <template #toolbar-tools>
-        <Button :icon="h(Plus)" type="primary" @click="onCreate">
-          {{ $t('ui.actionTitle.create', ['测评']) }}
-        </Button>
+        <TableAction
+          :actions="[
+            {
+              label: '添加测评',
+              type: 'primary',
+              icon: ACTION_ICON.ADD,
+              onClick: onCreate,
+            },
+          ]"
+        />
       </template>
 
       <!-- 测评类型 -->

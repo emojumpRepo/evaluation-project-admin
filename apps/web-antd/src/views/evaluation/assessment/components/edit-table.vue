@@ -2,10 +2,13 @@
 import type { Ref } from 'vue';
 
 import type { AssessmentQuestionnaireVO } from '#/api/evaluation/assessment/index';
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
-import { InputNumber, Switch, Table } from 'ant-design-vue';
+import { InputNumber, message, Select, Switch, Table } from 'ant-design-vue';
+
+import { getAllQuestionnaireList } from '#/api/evaluation/questionnaire';
 
 interface DataItem extends AssessmentQuestionnaireVO {
   key: string;
@@ -26,7 +29,7 @@ const emit = defineEmits<{
 
 const columns = [
   {
-    title: '问卷ID',
+    title: '选择问卷',
     dataIndex: 'questionnaireId',
   },
   {
@@ -48,6 +51,7 @@ const columns = [
 ];
 const dataSource: Ref<DataItem[]> = ref([]); // 数据源
 const count = computed(() => dataSource.value.length + 1); // 计数器
+const questionnaireList: Ref<QuestionnaireVO[]> = ref([]); // 问卷列表
 
 // 用于防止循环更新的标志
 let isInternalUpdate = false;
@@ -63,10 +67,7 @@ watch(
         ? newValue.map((item, index) => {
             const normalizedItem: DataItem = {
               key: `${index + 1}`,
-              questionnaireId: Math.max(
-                1,
-                Math.floor(Number(item.questionnaireId) || 1),
-              ),
+              questionnaireId: item.questionnaireId || 0,
               sortOrder: Math.max(1, Math.floor(item.sortOrder || index + 1)),
               isRequired:
                 item.isRequired === undefined ? true : Boolean(item.isRequired),
@@ -82,7 +83,9 @@ watch(
 // 同步数据到父组件的函数
 const syncToParent = () => {
   isInternalUpdate = true;
-  const result = dataSource.value.map(({ key: _key, ...item }) => item);
+  const result = dataSource.value
+    .filter((item) => item.questionnaireId > 0) // 过滤掉未选择问卷的行
+    .map(({ key: _key, ...item }) => item);
   emit('update:tableList', result);
   nextTick(() => {
     isInternalUpdate = false;
@@ -92,8 +95,9 @@ const syncToParent = () => {
 // 用于存储正在编辑的单元格，格式为 "rowKey-columnKey"
 const editingCell = ref<string>('');
 // 用于存储编辑中的值
-const editingValue = ref<number>(0);
+const editingValue = ref<number | string>('');
 const inputRef = ref();
+const selectRef = ref();
 
 // 获取单元格的键
 const getCellKey = (rowKey: string, columnKey: string) =>
@@ -125,19 +129,27 @@ const edit = (
   const cellKey = getCellKey(rowKey, columnKey);
   editingCell.value = cellKey;
 
-  // 确保currentValue是合法的数值
-  let numValue = 0;
-  if (typeof currentValue === 'number') {
-    numValue = currentValue;
-  } else if (typeof currentValue === 'string') {
-    const parsed = Number(currentValue);
-    numValue = Number.isNaN(parsed) ? 0 : parsed;
+  // 对于问卷ID，保持原值；对于其他数值字段，转换为数值
+  if (columnKey === 'questionnaireId') {
+    editingValue.value =
+      typeof currentValue === 'boolean' ? (currentValue ? 1 : 0) : currentValue;
+  } else {
+    // 确保currentValue是合法的数值
+    let numValue = 0;
+    if (typeof currentValue === 'number') {
+      numValue = currentValue;
+    } else if (typeof currentValue === 'string') {
+      const parsed = Number(currentValue);
+      numValue = Number.isNaN(parsed) ? 0 : parsed;
+    }
+    editingValue.value = numValue;
   }
-  editingValue.value = numValue;
 
   // 下一个tick聚焦到输入框
   nextTick(() => {
-    if (inputRef.value) {
+    if (columnKey === 'questionnaireId' && selectRef.value) {
+      selectRef.value.focus();
+    } else if (inputRef.value) {
       inputRef.value.focus();
     }
   });
@@ -156,9 +168,8 @@ const save = (rowKey: string, columnKey: string) => {
 
     switch (columnKey) {
       case 'questionnaireId': {
-        // 问卷ID必须是正整数
-        value = Math.max(1, Math.floor(Number(value) || 1));
-
+        // 问卷ID直接使用选择的值，确保是数字类型
+        value = Number(value) || 1;
         break;
       }
       case 'sortOrder': {
@@ -173,7 +184,6 @@ const save = (rowKey: string, columnKey: string) => {
 
         break;
       }
-      // No default
     }
 
     (item as any)[columnKey] = value;
@@ -181,7 +191,7 @@ const save = (rowKey: string, columnKey: string) => {
     syncToParent();
   }
   editingCell.value = '';
-  editingValue.value = 0;
+  editingValue.value = '';
 };
 
 /**
@@ -217,7 +227,7 @@ const onDelete = (key: string) => {
   // 如果正在编辑的是要删除的行，清除编辑状态
   if (editingCell.value && editingCell.value.startsWith(`${key}-`)) {
     editingCell.value = '';
-    editingValue.value = 0;
+    editingValue.value = '';
   }
 
   dataSource.value = dataSource.value.filter((item) => item.key !== key);
@@ -232,14 +242,36 @@ const handleSwitchChange = (rowKey: string, checked: any) => {
   }
 };
 
+const handleQuestionnaireChange = (rowKey: string, value: any) => {
+  const item = dataSource.value.find((item) => item.key === rowKey);
+  if (item && value !== undefined) {
+    // 检查是否已经存在相同的问卷ID
+    const existingSame = dataSource.value.find(
+      (existingItem) =>
+        existingItem.key !== rowKey &&
+        existingItem.questionnaireId === Number(value),
+    );
+
+    if (existingSame) {
+      // 找到对应的问卷标题用于提示
+      const questionnaire = questionnaireList.value.find(
+        (q) => q.id === Number(value),
+      );
+      const title = questionnaire ? questionnaire.title : `问卷ID: ${value}`;
+      message.warning(`问卷"${title}"已经被选择，请选择其他问卷`);
+      return; // 阻止重复选择
+    }
+
+    item.questionnaireId = Number(value);
+    // 同步到父组件
+    syncToParent();
+  }
+};
+
 /**
  * 添加行
  */
 const handleAdd = () => {
-  // 计算新的问卷ID，避免与现有数据冲突
-  const existingIds = dataSource.value.map((item) => item.questionnaireId);
-  const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
-
   // 计算新的排序号，确保sortOrder始终有值
   const existingSortOrders = dataSource.value
     .map((item) => item.sortOrder)
@@ -249,13 +281,28 @@ const handleAdd = () => {
 
   const newData: DataItem = {
     key: `${count.value}`,
-    questionnaireId: maxId + 1,
+    questionnaireId: 0, // 默认没有选中任何问卷
     sortOrder: maxSortOrder + 1,
     isRequired: true,
     weight: 0,
   };
   dataSource.value.push(newData);
-  syncToParent();
+};
+
+onMounted(async () => {
+  const res = await getAllQuestionnaireList();
+  questionnaireList.value = res || [];
+});
+
+const isQuestionnaireSelected = (
+  questionnaireId: number | undefined,
+  currentRowKey: string,
+) => {
+  if (!questionnaireId) return false;
+  return dataSource.value.some(
+    (item) =>
+      item.key !== currentRowKey && item.questionnaireId === questionnaireId,
+  );
 };
 </script>
 
@@ -267,12 +314,28 @@ const handleAdd = () => {
     :pagination="false"
   >
     <template #bodyCell="{ column, text, record }">
+      <template v-if="column.dataIndex === 'questionnaireId'">
+        <Select
+          :value="
+            record.questionnaireId > 0 ? record.questionnaireId : undefined
+          "
+          @change="(value) => handleQuestionnaireChange(record.key, value)"
+          style="width: 100%"
+          placeholder="请选择问卷"
+          allow-clear
+        >
+          <Select.Option
+            v-for="q in questionnaireList"
+            :key="q.id"
+            :value="q.id"
+            :disabled="isQuestionnaireSelected(q.id, record.key)"
+          >
+            {{ q.title }}
+          </Select.Option>
+        </Select>
+      </template>
       <template
-        v-if="
-          ['questionnaireId', 'sortOrder', 'weight'].includes(
-            column.dataIndex as string,
-          )
-        "
+        v-else-if="['sortOrder', 'weight'].includes(column.dataIndex as string)"
       >
         <div class="editable-cell">
           <div
