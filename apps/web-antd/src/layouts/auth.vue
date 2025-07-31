@@ -4,8 +4,6 @@ import { computed } from 'vue';
 import { AuthPageLayout } from '@vben/layouts';
 import { preferences } from '@vben/preferences';
 
-import { $t } from '#/locales';
-
 const appName = computed(() => preferences.app.name);
 const logo = computed(() => preferences.logo.source);
 </script>
@@ -14,8 +12,8 @@ const logo = computed(() => preferences.logo.source);
   <AuthPageLayout
     :app-name="appName"
     :logo="logo"
-    :page-description="$t('authentication.pageDesc')"
-    :page-title="$t('authentication.pageTitle')"
+    page-description="开始管理你的业务"
+    page-title="成都康培助残公益服务中心后台管理系统"
   >
     <!-- 自定义工具栏 -->
     <!-- <template #toolbar></template> -->

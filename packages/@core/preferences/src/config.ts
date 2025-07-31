@@ -64,7 +64,7 @@ const defaultPreferences: Preferences = {
     enable: true,
     fit: 'contain',
     source:
-      'http://test.yudao.iocoder.cn/user/avatar/20250722/J8FI9wd39tIt5d491c8bfc89f56abdf9a71a8e9011e1_1753171919801.png',
+      'http://119.29.105.88:48080/admin-api/infra/file/4/get/20250731/favicon_1753943000343.png',
   },
   navigation: {
     accordion: true,
