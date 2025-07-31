@@ -2,10 +2,13 @@
 import type { Ref } from 'vue';
 
 import type { AssessmentQuestionnaireVO } from '#/api/evaluation/assessment/index';
+import type { QuestionnaireVO } from '#/api/evaluation/questionnaire/index';
 
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 
-import { InputNumber, Switch, Table } from 'ant-design-vue';
+import { InputNumber, message, Select, Switch, Table } from 'ant-design-vue';
+
+import { getAllQuestionnaireList } from '#/api/evaluation/questionnaire';
 
 interface DataItem extends AssessmentQuestionnaireVO {
   key: string;
@@ -26,7 +29,7 @@ const emit = defineEmits<{
 
 const columns = [
   {
-    title: '问卷ID',
+    title: '选择问卷',
     dataIndex: 'questionnaireId',
   },
   {
@@ -48,6 +51,7 @@ const columns = [
 ];
 const dataSource: Ref<DataItem[]> = ref([]); // 数据源
 const count = computed(() => dataSource.value.length + 1); // 计数器
+const questionnaireList: Ref<QuestionnaireVO[]> = ref([]); // 问卷列表
 
 // 用于防止循环更新的标志
 let isInternalUpdate = false;
@@ -63,11 +67,11 @@ watch(
         ? newValue.map((item, index) => {
             const normalizedItem: DataItem = {
               key: `${index + 1}`,
-              questionnaireId: item.questionnaireId,
-              sortOrder: item.sortOrder || index + 1,
+              questionnaireId: item.questionnaireId || 0,
+              sortOrder: Math.max(1, Math.floor(item.sortOrder || index + 1)),
               isRequired:
-                item.isRequired === undefined ? true : item.isRequired,
-              weight: item.weight || 0,
+                item.isRequired === undefined ? true : Boolean(item.isRequired),
+              weight: Math.max(0, Number(item.weight) || 0),
             };
             return normalizedItem;
           })
@@ -79,7 +83,9 @@ watch(
 // 同步数据到父组件的函数
 const syncToParent = () => {
   isInternalUpdate = true;
-  const result = dataSource.value.map(({ key, ...item }) => item);
+  const result = dataSource.value
+    .filter((item) => item.questionnaireId > 0) // 过滤掉未选择问卷的行
+    .map(({ key: _key, ...item }) => item);
   emit('update:tableList', result);
   nextTick(() => {
     isInternalUpdate = false;
@@ -89,8 +95,9 @@ const syncToParent = () => {
 // 用于存储正在编辑的单元格，格式为 "rowKey-columnKey"
 const editingCell = ref<string>('');
 // 用于存储编辑中的值
-const editingValue = ref<number>(0);
+const editingValue = ref<number | string>('');
 const inputRef = ref();
+const selectRef = ref();
 
 // 获取单元格的键
 const getCellKey = (rowKey: string, columnKey: string) =>
@@ -121,11 +128,28 @@ const edit = (
 
   const cellKey = getCellKey(rowKey, columnKey);
   editingCell.value = cellKey;
-  editingValue.value = Number(currentValue) || 0;
+
+  // 对于问卷ID，保持原值；对于其他数值字段，转换为数值
+  if (columnKey === 'questionnaireId') {
+    editingValue.value =
+      typeof currentValue === 'boolean' ? (currentValue ? 1 : 0) : currentValue;
+  } else {
+    // 确保currentValue是合法的数值
+    let numValue = 0;
+    if (typeof currentValue === 'number') {
+      numValue = currentValue;
+    } else if (typeof currentValue === 'string') {
+      const parsed = Number(currentValue);
+      numValue = Number.isNaN(parsed) ? 0 : parsed;
+    }
+    editingValue.value = numValue;
+  }
 
   // 下一个tick聚焦到输入框
   nextTick(() => {
-    if (inputRef.value) {
+    if (columnKey === 'questionnaireId' && selectRef.value) {
+      selectRef.value.focus();
+    } else if (inputRef.value) {
       inputRef.value.focus();
     }
   });
@@ -139,19 +163,35 @@ const edit = (
 const save = (rowKey: string, columnKey: string) => {
   const item = dataSource.value.find((item) => item.key === rowKey);
   if (item && editingCell.value) {
-    // 根据字段类型进行适当的类型转换
+    // 根据字段类型进行适当的类型转换和验证
     let value: any = editingValue.value;
-    if (columnKey === 'questionnaireId' || columnKey === 'sortOrder') {
-      value = Number(value) || 0;
-    } else if (columnKey === 'weight') {
-      value = Number(value) || 0;
+
+    switch (columnKey) {
+      case 'questionnaireId': {
+        // 问卷ID直接使用选择的值，确保是数字类型
+        value = Number(value) || 1;
+        break;
+      }
+      case 'sortOrder': {
+        // 排序必须是正整数
+        value = Math.max(1, Math.floor(Number(value) || 1));
+
+        break;
+      }
+      case 'weight': {
+        // 权重可以是小数，但不能为负数
+        value = Math.max(0, Number(value) || 0);
+
+        break;
+      }
     }
+
     (item as any)[columnKey] = value;
     // 同步到父组件
     syncToParent();
   }
   editingCell.value = '';
-  editingValue.value = 0;
+  editingValue.value = '';
 };
 
 /**
@@ -169,14 +209,14 @@ const isEditing = (rowKey: string, columnKey: string) => {
  * @param columnKey 列键
  */
 const handleBlur = (rowKey: string, columnKey: string) => {
-  // 使用 setTimeout 确保失焦事件正确处理，但要检查是否还在编辑同一个单元格
+  // 使用较短的延迟时间确保失焦事件正确处理
   setTimeout(() => {
     const currentCellKey = getCellKey(rowKey, columnKey);
     // 只有当前仍在编辑这个单元格时才保存（避免被其他点击事件覆盖）
     if (editingCell.value === currentCellKey) {
       save(rowKey, columnKey);
     }
-  }, 150);
+  }, 100);
 };
 
 /**
@@ -184,6 +224,12 @@ const handleBlur = (rowKey: string, columnKey: string) => {
  * @param key 行键
  */
 const onDelete = (key: string) => {
+  // 如果正在编辑的是要删除的行，清除编辑状态
+  if (editingCell.value && editingCell.value.startsWith(`${key}-`)) {
+    editingCell.value = '';
+    editingValue.value = '';
+  }
+
   dataSource.value = dataSource.value.filter((item) => item.key !== key);
   syncToParent();
 };
@@ -196,19 +242,67 @@ const handleSwitchChange = (rowKey: string, checked: any) => {
   }
 };
 
+const handleQuestionnaireChange = (rowKey: string, value: any) => {
+  const item = dataSource.value.find((item) => item.key === rowKey);
+  if (item && value !== undefined) {
+    // 检查是否已经存在相同的问卷ID
+    const existingSame = dataSource.value.find(
+      (existingItem) =>
+        existingItem.key !== rowKey &&
+        existingItem.questionnaireId === Number(value),
+    );
+
+    if (existingSame) {
+      // 找到对应的问卷标题用于提示
+      const questionnaire = questionnaireList.value.find(
+        (q) => q.id === Number(value),
+      );
+      const title = questionnaire ? questionnaire.title : `问卷ID: ${value}`;
+      message.warning(`问卷"${title}"已经被选择，请选择其他问卷`);
+      return; // 阻止重复选择
+    }
+
+    item.questionnaireId = Number(value);
+    // 同步到父组件
+    syncToParent();
+  }
+};
+
 /**
  * 添加行
  */
 const handleAdd = () => {
+  // 计算新的排序号，确保sortOrder始终有值
+  const existingSortOrders = dataSource.value
+    .map((item) => item.sortOrder)
+    .filter((order): order is number => order !== undefined);
+  const maxSortOrder =
+    existingSortOrders.length > 0 ? Math.max(...existingSortOrders) : 0;
+
   const newData: DataItem = {
     key: `${count.value}`,
-    questionnaireId: count.value,
-    sortOrder: count.value,
+    questionnaireId: 0, // 默认没有选中任何问卷
+    sortOrder: maxSortOrder + 1,
     isRequired: true,
     weight: 0,
   };
   dataSource.value.push(newData);
-  syncToParent();
+};
+
+onMounted(async () => {
+  const res = await getAllQuestionnaireList();
+  questionnaireList.value = res || [];
+});
+
+const isQuestionnaireSelected = (
+  questionnaireId: number | undefined,
+  currentRowKey: string,
+) => {
+  if (!questionnaireId) return false;
+  return dataSource.value.some(
+    (item) =>
+      item.key !== currentRowKey && item.questionnaireId === questionnaireId,
+  );
 };
 </script>
 
@@ -220,12 +314,28 @@ const handleAdd = () => {
     :pagination="false"
   >
     <template #bodyCell="{ column, text, record }">
+      <template v-if="column.dataIndex === 'questionnaireId'">
+        <Select
+          :value="
+            record.questionnaireId > 0 ? record.questionnaireId : undefined
+          "
+          @change="(value) => handleQuestionnaireChange(record.key, value)"
+          style="width: 100%"
+          placeholder="请选择问卷"
+          allow-clear
+        >
+          <Select.Option
+            v-for="q in questionnaireList"
+            :key="q.id"
+            :value="q.id"
+            :disabled="isQuestionnaireSelected(q.id, record.key)"
+          >
+            {{ q.title }}
+          </Select.Option>
+        </Select>
+      </template>
       <template
-        v-if="
-          ['questionnaireId', 'sortOrder', 'weight'].includes(
-            column.dataIndex as string,
-          )
-        "
+        v-else-if="['sortOrder', 'weight'].includes(column.dataIndex as string)"
       >
         <div class="editable-cell">
           <div
@@ -239,7 +349,7 @@ const handleAdd = () => {
               ref="inputRef"
               :precision="column.dataIndex === 'weight' ? 2 : 0"
               :step="column.dataIndex === 'weight' ? 0.1 : 1"
-              :min="0"
+              :min="column.dataIndex === 'weight' ? 0 : 1"
             />
           </div>
           <div

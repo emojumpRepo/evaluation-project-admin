@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { AssessmentVO } from '#/api/evaluation/assessment/index';
 
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 import { useVbenModal } from '@vben/common-ui';
 
@@ -19,11 +19,7 @@ import { useAssessmentFormSchema } from '../data';
 
 const emit = defineEmits(['success']);
 const formData = ref<AssessmentVO>();
-const getTitle = computed(() => {
-  return formData.value?.id
-    ? $t('ui.actionTitle.edit', ['测评'])
-    : $t('ui.actionTitle.create', ['测评']);
-});
+const formTitle = ref<string>($t('ui.actionTitle.create', ['测评']));
 
 const [Form, formApi] = useVbenForm({
   commonConfig: {
@@ -53,8 +49,6 @@ const [Modal, modalApi] = useVbenModal({
       endTime: Number(data.endTime),
     };
 
-    console.log('添加提交的表单', formatData)
-
     try {
       await (data?.id
         ? updateAssessment(formatData)
@@ -79,9 +73,9 @@ const [Modal, modalApi] = useVbenModal({
     }
     if (data.id) {
       modalApi.lock();
+      formTitle.value = $t('ui.actionTitle.edit', ['测评']);
       try {
         const respData = await getAssessment(data.id);
-        // 转换 AssessmentRespVO 到 AssessmentVO 格式
         data = {
           ...respData,
         };
@@ -89,7 +83,7 @@ const [Modal, modalApi] = useVbenModal({
         modalApi.unlock();
       }
     }
-    
+
     await formApi.setValues(data);
   },
 });
@@ -97,7 +91,7 @@ const [Modal, modalApi] = useVbenModal({
 
 <template>
   <Modal
-    :title="getTitle"
+    :title="formTitle"
     class="w-[900px]"
     :fullscreen-button="false"
     :destroy-on-close="true"
