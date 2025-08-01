@@ -15,26 +15,24 @@ import {
   useQuestionnaireResultGridColumns,
   useQuestionnaireResultGridFormSchema,
 } from '../data';
-import ResultModel from './result-model.vue';
+import QuestionnaireResultModel from './questionnaire-result-model.vue';
 
 const props = defineProps<{
   id?: number; // 测评编号（主表的关联字段）
 }>();
 
 /** 测评结果弹窗 */
-const [Modal, modalApi] = useVbenModal({
+const [Modal, ModelApi] = useVbenModal({
   header: false,
   footer: false,
   fullscreenButton: false,
-  connectedComponent: ResultModel,
+  connectedComponent: QuestionnaireResultModel,
 });
 
 const onGet = (row: QuestionnaireResultVO) => {
-  modalApi
-    .setData({
-      id: row.id,
-    })
-    .open();
+  ModelApi.setData({
+    id: row.id,
+  }).open();
 };
 
 /** 表格 */

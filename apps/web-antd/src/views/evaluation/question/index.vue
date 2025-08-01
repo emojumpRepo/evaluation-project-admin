@@ -35,7 +35,6 @@ import { $t } from '#/locales';
 
 import { useQuestionGridColumns, useQuestionGridFormSchema } from './data';
 import AddForm from './modules/add-form.vue';
-import ResultList from './modules/result-list.vue';
 
 defineOptions({ name: 'QuestionnaireManagement' });
 
@@ -139,7 +138,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
   },
   gridOptions: {
     columns: useQuestionGridColumns(),
-    height: '600px',
+    height: 'auto',
     keepSource: true,
     editConfig: {
       mode: 'row',
@@ -203,128 +202,125 @@ onMounted(() => {
 <template>
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
+    <Grid table-title="问卷管理">
+      <template #toolbar-tools>
+        <TableAction
+          :actions="[
+            {
+              label: '同步最新数据',
+              type: 'primary',
+              icon: ACTION_ICON.REFRESH,
+              onClick: handleSync,
+            },
+            // {
+            //   label: '添加问卷',
+            //   type: 'primary',
+            //   icon: ACTION_ICON.ADD,
+            //   onClick: onCreate,
+            // },
+          ]"
+        />
+      </template>
 
-    <div class="flex flex-col gap-4">
-      <Grid table-title="问卷管理">
-        <template #toolbar-tools>
-          <TableAction
-            :actions="[
-              {
-                label: '同步最新数据',
-                type: 'primary',
-                icon: ACTION_ICON.REFRESH,
-                onClick: handleSync,
-              },
-              // {
-              //   label: '添加问卷',
-              //   type: 'primary',
-              //   icon: ACTION_ICON.ADD,
-              //   onClick: onCreate,
-              // },
-            ]"
-          />
-        </template>
+      <!-- 问卷类型列 -->
+      <template #type="{ row }">
+        <Tag color="blue">{{ getTypeLabel(row.type, 'questionnaire') }}</Tag>
+      </template>
 
-        <!-- 问卷类型列 -->
-        <template #type="{ row }">
-          <Tag color="blue">{{ getTypeLabel(row.type, 'questionnaire') }}</Tag>
-        </template>
+      <!-- 状态列 -->
+      <template #status="{ row }">
+        <Tag :color="getStatusColor(row.status, 'questionnaire')">
+          {{ getStatusLabel(row.status, 'questionnaire') }}
+        </Tag>
+      </template>
 
-        <!-- 状态列 -->
-        <template #status="{ row }">
-          <Tag :color="getStatusColor(row.status, 'questionnaire')">
-            {{ getStatusLabel(row.status, 'questionnaire') }}
-          </Tag>
-        </template>
+      <!-- 是否开放列 -->
+      <template #isOpen="{ row }">
+        <Tag :color="row.isOpen ? 'green' : 'red'">
+          {{ row.isOpen ? '开放' : '关闭' }}
+        </Tag>
+      </template>
 
-        <!-- 是否开放列 -->
-        <template #isOpen="{ row }">
-          <Tag :color="row.isOpen ? 'green' : 'red'">
-            {{ row.isOpen ? '开放' : '关闭' }}
-          </Tag>
-        </template>
+      <!-- 答题有效期开始列 -->
+      <template #validFrom="{ row }">
+        {{
+          row.validFrom
+            ? dayjs(row.validFrom).format('YYYY-MM-DD HH:mm:ss')
+            : '0'
+        }}
+      </template>
 
-        <!-- 答题有效期开始列 -->
-        <template #validFrom="{ row }">
-          {{
-            row.validFrom
-              ? dayjs(row.validFrom).format('YYYY-MM-DD HH:mm:ss')
-              : '0'
-          }}
-        </template>
+      <template #validFrom_edit="{ row }">
+        <DatePicker
+          v-model="row.validFrom"
+          type="datetime"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="x"
+          show-time
+        />
+      </template>
 
-        <template #validFrom_edit="{ row }">
-          <DatePicker
-            v-model="row.validFrom"
-            type="datetime"
-            format="YYYY-MM-DD HH:mm:ss"
-            value-format="x"
-            show-time
-          />
-        </template>
+      <!-- 答题有效期结束列 -->
+      <template #validTo="{ row }">
+        {{
+          row.validTo ? dayjs(row.validTo).format('YYYY-MM-DD HH:mm:ss') : '0'
+        }}
+      </template>
 
-        <!-- 答题有效期结束列 -->
-        <template #validTo="{ row }">
-          {{
-            row.validTo ? dayjs(row.validTo).format('YYYY-MM-DD HH:mm:ss') : '0'
-          }}
-        </template>
+      <template #validTo_edit="{ row }">
+        <DatePicker
+          v-model="row.validTo"
+          type="datetime"
+          format="YYYY-MM-DD HH:mm:ss"
+          value-format="x"
+          show-time
+        />
+      </template>
 
-        <template #validTo_edit="{ row }">
-          <DatePicker
-            v-model="row.validTo"
-            type="datetime"
-            format="YYYY-MM-DD HH:mm:ss"
-            value-format="x"
-            show-time
-          />
-        </template>
+      <template #operation="{ row }">
+        <div v-if="hasEditStatus(row)" class="flex w-full items-center gap-2">
+          <Button type="primary" @click="saveRowEvent(row)"> 保存 </Button>
+          <Button type="text" @click="cancelRowEvent()"> 取消 </Button>
+          <Dropdown>
+            <Button type="link">更多</Button>
+            <template #overlay>
+              <Menu>
+                <MenuItem @click="onEdit(row)">编辑</MenuItem>
+                <MenuItem danger @click="onDelete(row)">删除</MenuItem>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
+        <div v-else class="flex w-full items-center gap-2">
+          <Button
+            v-if="![1, 3].includes(row.status)"
+            type="link"
+            @click="onPublish(row)"
+          >
+            发布
+          </Button>
+          <Button
+            v-else-if="[1, 3].includes(row.status)"
+            type="link"
+            @click="onPause(row)"
+          >
+            暂停
+          </Button>
+          <Dropdown>
+            <Button type="link">更多</Button>
+            <template #overlay>
+              <Menu>
+                <MenuItem @click="onEdit(row)">编辑</MenuItem>
+                <MenuItem danger @click="onDelete(row)">删除</MenuItem>
+              </Menu>
+            </template>
+          </Dropdown>
+        </div>
+      </template>
+    </Grid>
 
-        <template #operation="{ row }">
-          <div v-if="hasEditStatus(row)" class="flex w-full items-center gap-2">
-            <Button type="primary" @click="saveRowEvent(row)"> 保存 </Button>
-            <Button type="text" @click="cancelRowEvent()"> 取消 </Button>
-            <Dropdown>
-              <Button type="link">更多</Button>
-              <template #overlay>
-                <Menu>
-                  <MenuItem @click="onEdit(row)">编辑</MenuItem>
-                  <MenuItem danger @click="onDelete(row)">删除</MenuItem>
-                </Menu>
-              </template>
-            </Dropdown>
-          </div>
-          <div v-else class="flex w-full items-center gap-2">
-            <Button
-              v-if="![1, 3].includes(row.status)"
-              type="link"
-              @click="onPublish(row)"
-            >
-              发布
-            </Button>
-            <Button
-              v-else-if="[1, 3].includes(row.status)"
-              type="link"
-              @click="onPause(row)"
-            >
-              暂停
-            </Button>
-            <Dropdown>
-              <Button type="link">更多</Button>
-              <template #overlay>
-                <Menu>
-                  <MenuItem @click="onEdit(row)">编辑</MenuItem>
-                  <MenuItem danger @click="onDelete(row)">删除</MenuItem>
-                </Menu>
-              </template>
-            </Dropdown>
-          </div>
-        </template>
-      </Grid>
-
-      <!-- 子表的表单 -->
-      <ResultList :id="selectQuestionnaire?.id" />
-    </div>
+    <!-- 子表的表单 -->
+    <!-- <ResultList :id="selectQuestionnaire?.id" /> -->
   </Page>
 </template>
 

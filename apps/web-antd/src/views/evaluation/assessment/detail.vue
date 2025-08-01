@@ -18,6 +18,7 @@ import {
   Row,
   Space,
   Statistic,
+  Tabs,
   Tag,
   Timeline,
 } from 'ant-design-vue';
@@ -32,12 +33,16 @@ import {
 } from '#/api/evaluation/assessment/index';
 import { getTypeLabel } from '#/api/evaluation/constants';
 
+import QuestionnaireResultList from './modules/questionnaire-result-list.vue';
+import ResultList from './modules/result-list.vue';
+
 const route = useRoute();
 
 const assessmentId = ref<number>();
 const assessment = ref<AssessmentVO>();
 const questionnaires = ref<QuestionnaireVO[]>([]);
 const loading = ref(false);
+const subTabsName = ref('assessmentResult');
 
 // 计算属性
 const statusConfig = computed(() => {
@@ -163,7 +168,7 @@ onMounted(async () => {
   <div class="min-h-screen bg-gray-50">
     <!-- 页面头部 -->
     <div class="mb-6 bg-white p-6 shadow-sm">
-      <div class="mx-auto flex max-w-6xl items-start justify-between">
+      <div class="mx-auto flex items-start justify-between px-6">
         <div class="flex-1">
           <h1
             class="m-0 mb-3 flex items-center gap-3 text-2xl font-semibold text-gray-800"
@@ -204,9 +209,19 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="mx-auto max-w-6xl px-6" v-if="assessment">
+    <div class="mx-auto px-12" v-if="assessment">
+      <!-- 子表的表单 -->
+      <Tabs v-model:active-key="subTabsName" class="mt-2">
+        <Tabs.TabPane key="assessmentResult" tab="测评结果" force-render>
+          <ResultList />
+        </Tabs.TabPane>
+        <Tabs.TabPane key="questionnaireResult" tab="问卷结果" force-render>
+          <QuestionnaireResultList />
+        </Tabs.TabPane>
+      </Tabs>
+
       <!-- 统计卡片 -->
-      <Row :gutter="24" class="mb-6">
+      <Row :gutter="24" class="my-6">
         <Col :span="8">
           <Card class="rounded-lg text-center shadow-sm">
             <Statistic

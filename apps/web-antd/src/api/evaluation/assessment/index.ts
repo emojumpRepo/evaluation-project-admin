@@ -167,13 +167,11 @@ export const getAssessmentResultPage = (params: AssessmentResultPageReqVO) => {
 };
 
 // 获取测评结果详情
-export const getAssessmentResult = (id: number) => {
+export const getAssessmentResult = (params: { id: number }) => {
   return requestClient.get<AssessmentResultRespVO>(
     `/emojump/assessment-result/get`,
     {
-      params: {
-        id,
-      },
+      params,
     },
   );
 };

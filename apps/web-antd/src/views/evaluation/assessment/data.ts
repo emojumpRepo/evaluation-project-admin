@@ -1,9 +1,6 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { OnActionClickFn } from '#/adapter/vxe-table';
-import type {
-  AssessmentResultRespVO,
-  AssessmentVO,
-} from '#/api/evaluation/assessment/index';
+import type { AssessmentVO } from '#/api/evaluation/assessment/index';
 
 // import { useAccess } from '@vben/access';
 import {
@@ -328,21 +325,21 @@ export function useAssessmentGridColumns(
 export function useAssessmentResultGridFormSchema(): VbenFormSchema[] {
   return [
     {
-      fieldName: 'assessmentId',
-      label: '测评编号',
+      fieldName: 'assessmentTitle',
+      label: '测评标题',
       component: 'Input',
       componentProps: {
         allowClear: true,
-        placeholder: '请输入测评编号',
+        placeholder: '请输入测评标题',
       },
     },
     {
-      fieldName: 'userId',
-      label: '用户编号',
+      fieldName: 'babyName',
+      label: '宝宝姓名',
       component: 'Input',
       componentProps: {
         allowClear: true,
-        placeholder: '请输入用户编号',
+        placeholder: '请输入宝宝姓名',
       },
     },
     {
@@ -357,54 +354,52 @@ export function useAssessmentResultGridFormSchema(): VbenFormSchema[] {
         ],
       },
     },
-    {
-      fieldName: 'completedTime',
-      label: '完成时间',
-      component: 'DatePicker',
-      componentProps: {
-        allowClear: true,
-        placeholder: '请选择完成时间',
-        showTime: true,
-        format: 'YYYY-MM-DD HH:mm:ss',
-        valueFormat: 'x',
-      },
-    },
   ];
 }
 
 /** 列表的字段 */
-export function useAssessmentResultGridColumns(
-  onActionClick?: OnActionClickFn<AssessmentResultRespVO>,
-) {
+export function useAssessmentResultGridColumns() {
   return [
-    { type: 'checkbox', width: 40 },
     {
       field: 'id',
-      title: '结果编号',
+      title: '编号',
+      width: 70,
     },
     {
-      field: 'assessmentId',
-      title: '测评编号',
+      field: 'assessmentTitle',
+      title: '测评标题',
     },
     {
-      field: 'userId',
-      title: '用户编号',
+      field: 'babyName',
+      title: '宝宝姓名',
     },
     {
       field: 'overallScore',
       title: '总体得分',
+      slots: {
+        default: 'overallScore',
+      },
     },
     {
-      field: 'overallLever',
+      field: 'overallLevel',
       title: '总体评级',
+      slots: {
+        default: 'overallLevel',
+      },
     },
     {
-      field: 'overallResult',
-      title: '总体测评报告',
-    },
-    {
-      field: 'completeTime',
+      field: 'completedTime',
       title: '完成时间',
+      slots: {
+        default: 'completedTime',
+      },
+    },
+    {
+      field: 'status',
+      title: '状态',
+      slots: {
+        default: 'status',
+      },
     },
     {
       field: 'operation',
@@ -412,26 +407,87 @@ export function useAssessmentResultGridColumns(
       align: 'center',
       fixed: 'right',
       showOverflow: false,
-      cellRender: {
-        attrs: {
-          nameField: 'id',
-          nameTitle: '测评结果',
-          onClick: onActionClick,
-        },
-        name: 'CellOperation',
-        options: [
-          {
-            code: 'get',
-            show: true,
-            // show: hasAccessByCodes(['evaluation:assessment-result:get']),
-          },
-          {
-            code: 'delete',
-            show: true,
-            // show: hasAccessByCodes(['evaluation:assessment-result:delete']),
-          },
-        ],
+      width: 100,
+      slots: {
+        default: 'actions',
       },
+    },
+  ];
+}
+
+// ================== 子表（问卷结果） =====================
+export function useQuestionnaireResultGridFormSchema() {
+  return [
+    {
+      fieldName: 'assessmentTitle',
+      label: '测评标题',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入测评标题',
+        allowClear: true,
+      },
+    },
+    {
+      fieldName: 'questionnaireTitle',
+      label: '问卷标题',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入问卷标题',
+        allowClear: true,
+      },
+    },
+    {
+      fieldName: 'babyName',
+      label: '宝宝姓名',
+      component: 'Input',
+      componentProps: {
+        placeholder: '请输入宝宝姓名',
+        allowClear: true,
+      },
+    },
+  ];
+}
+
+export function useQuestionnaireResultGridColumns() {
+  return [
+    {
+      title: '编号',
+      field: 'id',
+      width: 70,
+    },
+    {
+      title: '测评标题',
+      field: 'assessmentTitle',
+    },
+    {
+      title: '问卷标题',
+      field: 'questionnaireTitle',
+    },
+    {
+      title: '宝宝姓名',
+      field: 'babyName',
+    },
+    {
+      title: '问卷得分',
+      field: 'score',
+      slots: { default: 'score' },
+    },
+    {
+      title: '问卷评级',
+      field: 'level',
+      slots: { default: 'level' },
+    },
+    {
+      title: '完成时间',
+      field: 'completedTime',
+      formatter: 'formatDateTime',
+    },
+    {
+      title: '操作',
+      fixed: 'right',
+      field: 'actions',
+      width: 100,
+      slots: { default: 'actions' },
     },
   ];
 }

@@ -34,6 +34,9 @@ export interface QuestionnaireResultVO {
   assessmentResultId?: number;
   assessmentId?: number;
   babyId?: number;
+  assessmentTitle?: string;
+  babyName?: string;
+  questionnaireTitle?: string;
   questionnaireId?: number;
   resultData?: string;
   answerData?: string;
@@ -49,6 +52,9 @@ export interface QuestionnaireResultPageReqVO {
   assessmentId?: number;
   babyId?: number;
   questionnaireId?: number;
+  assessmentTitle?: string;
+  questionnaireTitle?: string;
+  babyName?: string;
   level?: string;
   completionTime?: string[];
   createTime?: string[];
