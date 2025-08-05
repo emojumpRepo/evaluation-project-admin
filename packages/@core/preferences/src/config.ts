@@ -23,7 +23,7 @@ const defaultPreferences: Preferences = {
     enablePreferences: true,
     enableRefreshToken: false,
     isMobile: false,
-    layout: 'sidebar-nav',
+    layout: 'header-nav',
     locale: 'zh-CN',
     loginExpiredMode: 'page',
     name: 'Vben Admin',
@@ -56,7 +56,7 @@ const defaultPreferences: Preferences = {
     enable: true,
     height: 50,
     hidden: false,
-    menuAlign: 'start',
+    menuAlign: 'center',
     mode: 'fixed',
   },
 
@@ -115,7 +115,7 @@ const defaultPreferences: Preferences = {
     colorWarning: 'hsl(42 84% 61%)',
     mode: 'light',
     radius: '0.5',
-    semiDarkHeader: false,
+    semiDarkHeader: true,
     semiDarkSidebar: false,
   },
   transition: {
