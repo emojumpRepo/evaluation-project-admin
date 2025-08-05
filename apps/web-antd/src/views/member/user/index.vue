@@ -12,10 +12,10 @@ import { getUserPage } from '#/api/member/user';
 import { $t } from '#/locales';
 
 import { useGridColumns, useGridFormSchema } from './data';
-import BalanceForm from './modules/balance-form.vue';
+// import BalanceForm from './modules/balance-form.vue';
 import Form from './modules/form.vue';
-import LeavelForm from './modules/leavel-form.vue';
-import PointForm from './modules/point-form.vue';
+// import LeavelForm from './modules/leavel-form.vue';
+// import PointForm from './modules/point-form.vue';
 
 const router = useRouter();
 
@@ -24,20 +24,20 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
-const [PointFormModal, pointFormModalApi] = useVbenModal({
-  connectedComponent: PointForm,
-  destroyOnClose: true,
-});
+// const [PointFormModal, pointFormModalApi] = useVbenModal({
+//   connectedComponent: PointForm,
+//   destroyOnClose: true,
+// });
 
-const [BalanceFormModal, balanceFormModalApi] = useVbenModal({
-  connectedComponent: BalanceForm,
-  destroyOnClose: true,
-});
+// const [BalanceFormModal, balanceFormModalApi] = useVbenModal({
+//   connectedComponent: BalanceForm,
+//   destroyOnClose: true,
+// });
 
-const [LeavelFormModal, leavelFormModalApi] = useVbenModal({
-  connectedComponent: LeavelForm,
-  destroyOnClose: true,
-});
+// const [LeavelFormModal, leavelFormModalApi] = useVbenModal({
+//   connectedComponent: LeavelForm,
+//   destroyOnClose: true,
+// });
 
 /** 刷新表格数据 */
 function onRefresh() {
@@ -51,9 +51,9 @@ function setCheckedIds({ records }: { records: MemberUserApi.User[] }) {
 }
 
 /** 发送优惠券 */
-function handleSendCoupon() {
-  formModalApi.setData(null).open();
-}
+// function handleSendCoupon() {
+//   formModalApi.setData(null).open();
+// }
 
 /** 编辑会员 */
 function handleEdit(row: MemberUserApi.User) {
@@ -61,19 +61,19 @@ function handleEdit(row: MemberUserApi.User) {
 }
 
 /** 修改会员等级 */
-function handleUpdateLevel(row: MemberUserApi.User) {
-  leavelFormModalApi.setData(row).open();
-}
+// function handleUpdateLevel(row: MemberUserApi.User) {
+//   leavelFormModalApi.setData(row).open();
+// }
 
 /** 修改会员积分 */
-function handleUpdatePoint(row: MemberUserApi.User) {
-  pointFormModalApi.setData(row).open();
-}
+// function handleUpdatePoint(row: MemberUserApi.User) {
+//   pointFormModalApi.setData(row).open();
+// }
 
 /** 修改会员余额 */
-function handleUpdateBalance(row: MemberUserApi.User) {
-  balanceFormModalApi.setData(row).open();
-}
+// function handleUpdateBalance(row: MemberUserApi.User) {
+//   balanceFormModalApi.setData(row).open();
+// }
 
 /** 查看会员详情 */
 function handleViewDetail(row: MemberUserApi.User) {
@@ -131,11 +131,11 @@ onMounted(async () => {
 <template>
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
-    <PointFormModal @success="onRefresh" />
+    <!-- <PointFormModal @success="onRefresh" />
     <BalanceFormModal @success="onRefresh" />
-    <LeavelFormModal @success="onRefresh" />
+    <LeavelFormModal @success="onRefresh" /> -->
     <Grid table-title="会员列表">
-      <template #toolbar-tools>
+      <!-- <template #toolbar-tools>
         <TableAction
           :actions="[
             {
@@ -147,7 +147,7 @@ onMounted(async () => {
             },
           ]"
         />
-      </template>
+      </template> -->
 
       <template #actions="{ row }">
         <TableAction
@@ -158,31 +158,12 @@ onMounted(async () => {
               icon: ACTION_ICON.VIEW,
               onClick: handleViewDetail.bind(null, row),
             },
-          ]"
-          :drop-down-actions="[
             {
               label: $t('common.edit'),
               type: 'link',
+              icon: ACTION_ICON.EDIT,
               auth: ['member:user:update'],
               onClick: handleEdit.bind(null, row),
-            },
-            {
-              label: '修改等级',
-              type: 'link',
-              auth: ['member:user:update-level'],
-              onClick: handleUpdateLevel.bind(null, row),
-            },
-            {
-              label: '修改积分',
-              type: 'link',
-              auth: ['member:user:update-point'],
-              onClick: handleUpdatePoint.bind(null, row),
-            },
-            {
-              label: '修改余额',
-              type: 'link',
-              auth: ['pay:wallet:update-balance'],
-              onClick: handleUpdateBalance.bind(null, row),
             },
           ]"
         />

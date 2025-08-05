@@ -8,19 +8,12 @@ import { useRoute } from 'vue-router';
 import { Page, useVbenModal } from '@vben/common-ui';
 import { useTabs } from '@vben/hooks';
 
-import { Button, Card, message, TabPane, Tabs } from 'ant-design-vue';
+import { Button, message } from 'ant-design-vue';
 
 import { getUser } from '#/api/member/user';
-import { getWallet } from '#/api/pay/wallet/balance';
 import { $t } from '#/locales';
 
-import UserAccountInfo from '../components/user-account-info.vue';
-import UserAddressList from '../components/user-address-list.vue';
-import UserBalanceList from '../components/user-balance-list.vue';
 import UserBasicInfo from '../components/user-basic-info.vue';
-import UserExperienceRecordList from '../components/user-experience-record-list.vue';
-import UserPointList from '../components/user-point-list.vue';
-import UserSignList from '../components/user-sign-list.vue';
 import Form from './form.vue';
 
 const route = useRoute();
@@ -48,7 +41,7 @@ async function getUserDetail() {
     return;
   }
   user.value = await getUser(userId);
-  wallet.value = (await getWallet({ userId })) || WALLET_INIT_DATA;
+  wallet.value = WALLET_INIT_DATA;
 }
 
 function handleEdit() {
@@ -71,16 +64,16 @@ onMounted(async () => {
           </Button>
         </template>
       </UserBasicInfo>
-      <UserAccountInfo
+      <!-- <UserAccountInfo
         v-if="user && wallet"
         class="ml-4 w-2/5"
         :user="user"
         :wallet="wallet"
       >
         <template #title> 账户信息 </template>
-      </UserAccountInfo>
+      </UserAccountInfo> -->
     </div>
-    <div class="mt-4">
+    <!-- <div class="mt-4">
       <Card title="账户明细">
         <Tabs>
           <TabPane tab="积分" key="UserPointList">
@@ -99,37 +92,32 @@ onMounted(async () => {
             <UserAddressList class="h-full" :user-id="userId" />
           </TabPane>
           <TabPane tab="订单管理" key="UserOrderList">
-            <!-- Todo: 商城模块 -->
             <div class="h-full">
               <h1>订单管理</h1>
             </div>
           </TabPane>
           <TabPane tab="售后管理" key="UserAfterSaleList">
-            <!-- Todo: 商城模块 -->
             <div class="h-full">
               <h1>售后管理</h1>
             </div>
           </TabPane>
           <TabPane tab="收藏记录" key="UserFavoriteList">
-            <!-- Todo: 商城模块 -->
             <div class="h-full">
               <h1>收藏记录</h1>
             </div>
           </TabPane>
           <TabPane tab="优惠劵" key="UserCouponList">
-            <!-- Todo: 商城模块 -->
             <div class="h-full">
               <h1>优惠劵</h1>
             </div>
           </TabPane>
           <TabPane tab="推广用户" key="UserBrokerageList">
-            <!-- Todo: 商城模块 -->
             <div class="h-full">
               <h1>推广用户</h1>
             </div>
           </TabPane>
         </Tabs>
       </Card>
-    </div>
+    </div> -->
   </Page>
 </template>

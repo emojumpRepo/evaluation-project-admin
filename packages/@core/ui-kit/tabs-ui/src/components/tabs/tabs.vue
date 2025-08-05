@@ -46,21 +46,23 @@ const typeWithClass = computed(() => {
 });
 
 const tabsView = computed(() => {
-  return props.tabs.map((tab) => {
-    const { fullPath, meta, name, path, key } = tab || {};
-    const { affixTab, icon, newTabTitle, tabClosable, title } = meta || {};
-    return {
-      affixTab: !!affixTab,
-      closable: Reflect.has(meta, 'tabClosable') ? !!tabClosable : true,
-      fullPath,
-      icon: icon as string,
-      key,
-      meta,
-      name,
-      path,
-      title: (newTabTitle || title || name) as string,
-    } as TabConfig;
-  });
+  return props.tabs
+    .filter((tab) => tab.key !== '/analytics') // 过滤掉analytics tab
+    .map((tab) => {
+      const { fullPath, meta, name, path, key } = tab || {};
+      const { affixTab, icon, newTabTitle, tabClosable, title } = meta || {};
+      return {
+        affixTab: !!affixTab,
+        closable: Reflect.has(meta, 'tabClosable') ? !!tabClosable : true,
+        fullPath,
+        icon: icon as string,
+        key,
+        meta,
+        name,
+        path,
+        title: (newTabTitle || title || name) as string,
+      } as TabConfig;
+    });
 });
 
 function onMouseDown(e: MouseEvent, tab: TabConfig) {

@@ -3,6 +3,7 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { QuestionnaireResultVO } from '#/api/evaluation/questionnaire/index';
 
 import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 import { useVbenModal } from '@vben/common-ui';
 
@@ -17,9 +18,7 @@ import {
 } from '../data';
 import QuestionnaireResultModel from './questionnaire-result-model.vue';
 
-const props = defineProps<{
-  id?: number; // 测评编号（主表的关联字段）
-}>();
+const route = useRoute();
 
 /** 测评结果弹窗 */
 const [Modal, ModelApi] = useVbenModal({
@@ -45,16 +44,18 @@ const [Grid, gridApi] = useVbenVxeGrid({
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
-          if (props.id) {
-            formValues.assessmentId = props.id;
+          if (route.query.id) {
+            formValues.assessmentId = route.query.id;
+            return await getQuestionnaireResultList({
+              pageNo: page.currentPage,
+              pageSize: page.pageSize,
+              ...formValues,
+            });
           }
-          const res = await getQuestionnaireResultList({
-            pageNo: page.currentPage,
-            pageSize: page.pageSize,
-            ...formValues,
-          });
-          // console.log('获取问卷结果列表', res);
-          return res;
+          return {
+            data: [],
+            total: 0,
+          };
         },
       },
     },

@@ -66,7 +66,7 @@ const dashboardMenus = [
         path: '/analytics',
         component: '/dashboard/analytics/index',
         meta: {
-          affixTab: true,
+          // affixTab: true,
           title: 'page.dashboard.analytics',
         },
       },

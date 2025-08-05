@@ -5,13 +5,8 @@ import { h } from 'vue';
 
 import { convertToInteger, formatToFraction } from '@vben/utils';
 
-import { Tag } from 'ant-design-vue';
-
 import { z } from '#/adapter/form';
-import { getSimpleGroupList } from '#/api/member/group';
 import { getSimpleLevelList } from '#/api/member/level';
-import { getSimpleTagList } from '#/api/member/tag';
-import { getAreaTree } from '#/api/system/area';
 import {
   CommonStatusEnum,
   DICT_TYPE,
@@ -83,39 +78,39 @@ export function useFormSchema(): VbenFormSchema[] {
         format: 'YYYY-MM-DD',
       },
     },
-    {
-      component: 'ApiTreeSelect',
-      fieldName: 'areaId',
-      label: '所在地',
-      componentProps: {
-        api: () => getAreaTree(),
-        fieldNames: { label: 'name', value: 'id', children: 'children' },
-      },
-    },
-    {
-      component: 'ApiSelect',
-      fieldName: 'tagIds',
-      label: '用户标签',
-      componentProps: {
-        api: () => getSimpleTagList(),
-        fieldNames: { label: 'name', value: 'id' },
-        mode: 'multiple',
-      },
-    },
-    {
-      component: 'ApiSelect',
-      fieldName: 'groupId',
-      label: '用户分组',
-      componentProps: {
-        api: () => getSimpleGroupList(),
-        fieldNames: { label: 'name', value: 'id' },
-      },
-    },
-    {
-      component: 'Textarea',
-      fieldName: 'mark',
-      label: '会员备注',
-    },
+    // {
+    //   component: 'ApiTreeSelect',
+    //   fieldName: 'areaId',
+    //   label: '所在地',
+    //   componentProps: {
+    //     api: () => getAreaTree(),
+    //     fieldNames: { label: 'name', value: 'id', children: 'children' },
+    //   },
+    // },
+    // {
+    //   component: 'ApiSelect',
+    //   fieldName: 'tagIds',
+    //   label: '用户标签',
+    //   componentProps: {
+    //     api: () => getSimpleTagList(),
+    //     fieldNames: { label: 'name', value: 'id' },
+    //     mode: 'multiple',
+    //   },
+    // },
+    // {
+    //   component: 'ApiSelect',
+    //   fieldName: 'groupId',
+    //   label: '用户分组',
+    //   componentProps: {
+    //     api: () => getSimpleGroupList(),
+    //     fieldNames: { label: 'name', value: 'id' },
+    //   },
+    // },
+    // {
+    //   component: 'Textarea',
+    //   fieldName: 'mark',
+    //   label: '会员备注',
+    // },
   ];
 }
 
@@ -148,34 +143,34 @@ export function useGridFormSchema(): VbenFormSchema[] {
         ...getRangePickerDefaultProps(),
       },
     },
-    {
-      fieldName: 'tagIds',
-      label: '用户标签',
-      component: 'ApiSelect',
-      componentProps: {
-        api: () => getSimpleTagList(),
-        fieldNames: { label: 'name', value: 'id' },
-        mode: 'multiple',
-      },
-    },
-    {
-      fieldName: 'levelId',
-      label: '用户等级',
-      component: 'ApiSelect',
-      componentProps: {
-        api: () => getSimpleLevelList(),
-        fieldNames: { label: 'name', value: 'id' },
-      },
-    },
-    {
-      fieldName: 'groupId',
-      label: '用户分组',
-      component: 'ApiSelect',
-      componentProps: {
-        api: () => getSimpleGroupList(),
-        fieldNames: { label: 'name', value: 'id' },
-      },
-    },
+    // {
+    //   fieldName: 'tagIds',
+    //   label: '用户标签',
+    //   component: 'ApiSelect',
+    //   componentProps: {
+    //     api: () => getSimpleTagList(),
+    //     fieldNames: { label: 'name', value: 'id' },
+    //     mode: 'multiple',
+    //   },
+    // },
+    // {
+    //   fieldName: 'levelId',
+    //   label: '用户等级',
+    //   component: 'ApiSelect',
+    //   componentProps: {
+    //     api: () => getSimpleLevelList(),
+    //     fieldNames: { label: 'name', value: 'id' },
+    //   },
+    // },
+    // {
+    //   fieldName: 'groupId',
+    //   label: '用户分组',
+    //   component: 'ApiSelect',
+    //   componentProps: {
+    //     api: () => getSimpleGroupList(),
+    //     fieldNames: { label: 'name', value: 'id' },
+    //   },
+    // },
   ];
 }
 
@@ -210,37 +205,37 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       field: 'nickname',
       title: '昵称',
     },
-    {
-      field: 'levelName',
-      title: '等级',
-    },
-    {
-      field: 'groupName',
-      title: '分组',
-    },
-    {
-      field: 'tagNames',
-      title: '用户标签',
-      slots: {
-        default: ({ row }) => {
-          return row.tagNames?.map((tagName: string, index: number) => {
-            return h(
-              Tag,
-              {
-                key: index,
-                class: 'mr-5px',
-                color: 'blue',
-              },
-              () => tagName,
-            );
-          });
-        },
-      },
-    },
-    {
-      field: 'point',
-      title: '积分',
-    },
+    // {
+    //   field: 'levelName',
+    //   title: '等级',
+    // },
+    // {
+    //   field: 'groupName',
+    //   title: '分组',
+    // },
+    // {
+    //   field: 'tagNames',
+    //   title: '用户标签',
+    //   slots: {
+    //     default: ({ row }) => {
+    //       return row.tagNames?.map((tagName: string, index: number) => {
+    //         return h(
+    //           Tag,
+    //           {
+    //             key: index,
+    //             class: 'mr-5px',
+    //             color: 'blue',
+    //           },
+    //           () => tagName,
+    //         );
+    //       });
+    //     },
+    //   },
+    // },
+    // {
+    //   field: 'point',
+    //   title: '积分',
+    // },
     {
       field: 'status',
       title: '状态',

@@ -3,6 +3,7 @@ import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { AssessmentResultRespVO } from '#/api/evaluation/assessment/index';
 
 import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 import { useVbenModal } from '@vben/common-ui';
 
@@ -18,9 +19,7 @@ import {
 } from '../data';
 import ResultModel from './result-model.vue';
 
-const props = defineProps<{
-  id?: number; // 测评编号（主表的关联字段）
-}>();
+const route = useRoute();
 
 /** 测评结果弹窗 */
 const [Model, ModelApi] = useVbenModal({
@@ -52,14 +51,18 @@ const [Grid, gridApi] = useVbenVxeGrid({
     proxyConfig: {
       ajax: {
         query: async ({ page }, formValues) => {
-          if (props.id) {
-            formValues.assessmentId = props.id;
+          if (route.query.id) {
+            formValues.assessmentId = route.query.id;
+            return await getAssessmentResultPage({
+              pageNo: page.currentPage,
+              pageSize: page.pageSize,
+              ...formValues,
+            });
           }
-          return await getAssessmentResultPage({
-            pageNo: page.currentPage,
-            pageSize: page.pageSize,
-            ...formValues,
-          });
+          return {
+            data: [],
+            total: 0,
+          };
         },
       },
     },

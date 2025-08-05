@@ -6,9 +6,12 @@ const routes: RouteRecordRaw[] = [
   {
     meta: {
       icon: 'lucide:layout-dashboard',
-      order: -1,
+      // order: -1,
       title: $t('page.dashboard.title'),
       hideInMenu: true,
+      hideChildrenInMenu: true,
+      hideInBreadcrumb: true,
+      hideInTab: true,
     },
     name: 'Dashboard',
     path: '/dashboard',
@@ -21,6 +24,9 @@ const routes: RouteRecordRaw[] = [
           icon: 'carbon:workspace',
           title: $t('page.dashboard.workspace'),
           hideInMenu: true,
+          hideChildrenInMenu: true,
+          hideInBreadcrumb: true,
+          hideInTab: true,
         },
       },
       {
@@ -28,10 +34,13 @@ const routes: RouteRecordRaw[] = [
         path: '/analytics',
         component: () => import('#/views/dashboard/analytics/index.vue'),
         meta: {
-          affixTab: true,
+          // affixTab: true,
           icon: 'lucide:area-chart',
           title: $t('page.dashboard.analytics'),
           hideInMenu: true,
+          hideChildrenInMenu: true,
+          hideInBreadcrumb: true,
+          hideInTab: true,
         },
       },
     ],
