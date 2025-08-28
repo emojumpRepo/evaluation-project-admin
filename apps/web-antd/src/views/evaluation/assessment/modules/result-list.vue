@@ -6,12 +6,16 @@ import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 import { useVbenModal } from '@vben/common-ui';
+import { downloadFileFromBlobPart } from '@vben/utils';
 
 import { message, Tag } from 'ant-design-vue';
 import dayjs from 'dayjs';
 
 import { TableAction, useVbenVxeGrid } from '#/adapter/vxe-table';
-import { getAssessmentResultPage } from '#/api/evaluation/assessment/index';
+import {
+  exportAssessmentResult,
+  getAssessmentResultPage,
+} from '#/api/evaluation/assessment/index';
 
 import {
   useAssessmentResultGridColumns,
@@ -39,6 +43,44 @@ async function onGet(row: AssessmentResultRespVO) {
   ModelApi.setData({
     id: row.id,
   }).open();
+}
+
+/** 导出测评结果 */
+async function onExport(row: AssessmentResultRespVO) {
+  if (!row?.id) {
+    message.warning('无法导出：缺少结果编号');
+    return;
+  }
+  const hide = message.loading({
+    content: '正在导出...',
+    key: 'export_assessment_result',
+  });
+  try {
+    const blob = await exportAssessmentResult(row.id);
+    // 校验返回内容是否为有效 PDF
+    if (!blob || blob.size === 0) {
+      message.error('导出失败：服务未返回文件');
+      return;
+    }
+    if (
+      (blob as any).type &&
+      String((blob as any).type).includes('application/json')
+    ) {
+      try {
+        const text = await (blob as Blob).text();
+        const json = JSON.parse(text);
+        message.error(json?.message || json?.msg || '导出失败：服务返回错误');
+      } catch {
+        message.error('导出失败：服务返回错误');
+      }
+      return;
+    }
+    // 默认文件名：测评结果-标题-宝宝名-时间.pdf
+    const fileName = `测评结果-${row.assessmentTitle || row.assessmentId}-${row.babyName || row.babyId}-${dayjs(row.completedTime).format('YYYYMMDDHHmmss')}.pdf`;
+    downloadFileFromBlobPart({ fileName, source: blob });
+  } finally {
+    hide();
+  }
 }
 
 /** 表格 */
@@ -130,6 +172,11 @@ onMounted(() => {
             label: '查看',
             type: 'link',
             onClick: onGet.bind(null, row),
+          },
+          {
+            label: '导出',
+            type: 'link',
+            onClick: onExport.bind(null, row),
           },
         ]"
       />

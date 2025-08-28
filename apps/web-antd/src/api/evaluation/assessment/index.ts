@@ -175,3 +175,11 @@ export const getAssessmentResult = (params: { id: number }) => {
     },
   );
 };
+
+// 导出测评结果 PDF（单条）
+export const exportAssessmentResult = (assessmentResultId: number) => {
+  return requestClient.download(
+    `/emojump/assessment-result/export-result-pdf`,
+    { params: { assessmentResultId } },
+  );
+};
