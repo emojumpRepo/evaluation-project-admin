@@ -64,7 +64,7 @@ const defaultPreferences: Preferences = {
     enable: true,
     fit: 'contain',
     source:
-      'http://119.29.105.88:48080/admin-api/infra/file/4/get/20250731/favicon_1753943000343.png',
+      'https://kangpei-1371067330.cos.ap-guangzhou.myqcloud.com/20250821/favicon_1755741499430.png',
   },
   navigation: {
     accordion: true,

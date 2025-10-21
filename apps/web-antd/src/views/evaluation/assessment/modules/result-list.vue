@@ -177,6 +177,7 @@ onMounted(() => {
             label: '导出',
             type: 'link',
             onClick: onExport.bind(null, row),
+            ifShow: row.status === 1,
           },
         ]"
       />
