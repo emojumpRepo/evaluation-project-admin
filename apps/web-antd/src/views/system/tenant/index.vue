@@ -5,7 +5,7 @@ import type { SystemTenantPackageApi } from '#/api/system/tenant-package';
 
 import { onMounted, ref } from 'vue';
 
-import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 import { downloadFileFromBlobPart } from '@vben/utils';
 
 import { message } from 'ant-design-vue';

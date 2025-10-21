@@ -2,7 +2,7 @@
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 import type { SystemOAuth2TokenApi } from '#/api/system/oauth2/token';
 
-import { DocAlert, Page } from '@vben/common-ui';
+import { Page } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
 
