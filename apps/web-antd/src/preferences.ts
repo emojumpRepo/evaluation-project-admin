@@ -12,6 +12,7 @@ export const overridesPreferences = defineOverridesPreferences({
     accessMode: 'backend',
     name: import.meta.env.VITE_APP_TITLE,
     enableRefreshToken: true,
+    authPageLayout: 'panel-center',
   },
   footer: {
     /** 默认关闭 footer 页脚，因为有一定遮挡 */
@@ -20,6 +21,6 @@ export const overridesPreferences = defineOverridesPreferences({
   },
   copyright: {
     companyName: import.meta.env.VITE_APP_TITLE,
-    companySiteLink: 'https://gitee.com/yudaocode/yudao-ui-admin-vben',
+    companySiteLink: 'https://www.baidu.com',
   },
 });

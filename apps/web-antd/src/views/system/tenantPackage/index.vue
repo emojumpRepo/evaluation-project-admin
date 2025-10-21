@@ -86,9 +86,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 <template>
   <Page auto-content-height>
-    <template #doc>
-      <DocAlert title="SaaS 多租户" url="https://doc.iocoder.cn/saas-tenant/" />
-    </template>
+    <template #doc></template>
 
     <FormModal @success="onRefresh" />
     <Grid table-title="租户套餐列表">

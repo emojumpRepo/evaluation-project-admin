@@ -85,9 +85,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 </script>
 <template>
   <Page auto-content-height>
-    <template #doc>
-      <DocAlert title="邮件配置" url="https://doc.iocoder.cn/mail" />
-    </template>
+    <template #doc></template>
 
     <FormModal @success="onRefresh" />
     <Grid table-title="邮箱账号列表">

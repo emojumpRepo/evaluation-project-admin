@@ -12,8 +12,8 @@ const logo = computed(() => preferences.logo.source);
   <AuthPageLayout
     :app-name="appName"
     :logo="logo"
-    page-description="开始管理你的业务"
-    page-title="成都康培助残公益服务中心后台管理系统"
+    page-description="安全高效的内部测评管理平台"
+    page-title="内部测评管理系统"
   >
     <!-- 自定义工具栏 -->
     <!-- <template #toolbar></template> -->
