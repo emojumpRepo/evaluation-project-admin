@@ -237,9 +237,7 @@ const [ResultModel, resultModelApi] = useVbenModal({
   <ResultModel class="w-3/4 p-4">
     <div v-if="resultData" class="overflow-y-auto bg-gray-50/30 p-6">
       <!-- 整体评估概览 -->
-      <div
-        class="mb-8 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-6 shadow-sm"
-      >
+      <div class="mb-8 rounded-2xl bg-blue-50 p-6 shadow-sm">
         <div class="mb-4 flex items-center gap-3">
           <div class="rounded-lg bg-blue-100 p-2">
             <span class="text-xl">📋</span>
@@ -397,9 +395,7 @@ const [ResultModel, resultModelApi] = useVbenModal({
         </div>
         <div class="p-6">
           <!-- 建议总述 -->
-          <div
-            class="mb-6 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 p-4"
-          >
+          <div class="mb-6 rounded-lg bg-purple-50 p-4">
             <div class="flex items-start gap-3">
               <div class="rounded-full bg-purple-100 p-2">
                 <span class="text-sm">🎯</span>

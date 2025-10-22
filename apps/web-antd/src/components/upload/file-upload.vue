@@ -188,9 +188,7 @@ function getValue() {
       <div v-if="showDescription" class="mt-2 flex flex-wrap items-center">
         请上传不超过
         <div class="text-primary mx-1 font-bold">{{ maxSize }}MB</div>
-        的
-        <div class="text-primary mx-1 font-bold">{{ accept.join('/') }}</div>
-        格式文件
+        的文件
       </div>
     </Upload>
   </div>

@@ -10,7 +10,7 @@ export namespace EmojumpArticleApi {
     title: string;
     content: string;
     coverImage: string;
-    category: string;
+    categoryId: number;
     remark: string;
     viewCount: number;
     status: number;
@@ -18,34 +18,32 @@ export namespace EmojumpArticleApi {
   }
 }
 
-export const ARTICLE_CATEGORY_OPTIONS = [
-  {
-    label: '儿童发展与干预',
-    value: '1',
-  },
-  {
-    label: '儿童精神健康',
-    value: '2',
-  },
-  {
-    label: '膳食与健康',
-    value: '3',
-  },
-  {
-    label: '心理健康与生活方式',
-    value: '4',
-  },
-];
-
 export const ARTICLE_STATUS_OPTIONS = [
   { label: '草稿', value: 0 },
   { label: '发布', value: 1 },
   { label: '下架', value: 2 },
 ];
 
+// Category options will be loaded dynamically from the API
+let categoryOptionsCache: Array<{ label: string; value: number | string }> = [];
+
+/** 设置文章分类选项缓存 */
+export const setCategoryOptionsCache = (
+  options: Array<{ label: string; value: number | string }>,
+) => {
+  categoryOptionsCache = options;
+};
+
+/** 获取文章分类选项缓存 */
+export const getCategoryOptionsCache = () => {
+  return categoryOptionsCache;
+};
+
 /** 获取文章类型标签 */
-export const getArticleCategoryLabel = (value: string) => {
-  return ARTICLE_CATEGORY_OPTIONS.find((item) => item.value === value)?.label;
+export const getArticleCategoryLabel = (value: number | string) => {
+  return categoryOptionsCache.find(
+    (item) => String(item.value) === String(value),
+  )?.label;
 };
 
 /** 获取文章状态标签 */

@@ -378,7 +378,7 @@ const isQuestionnaireSelected = (
         class="hover:bg-grey-300 cursor-pointer p-2 text-center"
         @click="handleAdd"
       >
-        Add
+        + 添加测评问卷
       </div>
     </template>
   </Table>
