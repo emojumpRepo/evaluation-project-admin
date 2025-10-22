@@ -173,10 +173,7 @@ onMounted(async () => {
           <h1
             class="m-0 mb-3 flex items-center gap-3 text-2xl font-semibold text-gray-800"
           >
-            <Avatar
-              :size="40"
-              class="bg-gradient-to-br from-indigo-400 to-purple-500"
-            >
+            <Avatar :size="40" class="bg-indigo-500">
               <template #icon>
                 {{ getUserInitial(assessment?.title) }}
               </template>
@@ -486,7 +483,7 @@ onMounted(async () => {
 }
 
 .title-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
 }
 
 .title-meta {

@@ -5,7 +5,7 @@ import type { SystemMailTemplateApi } from '#/api/system/mail/template';
 
 import { onMounted, ref } from 'vue';
 
-import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 
 import { message } from 'ant-design-vue';
 

@@ -44,18 +44,14 @@ const getProgressPercent = (value: number, range: number[]) => {
       <!-- 标题区域 -->
       <div class="mb-10 text-center">
         <h2 class="mb-1 text-2xl font-bold text-gray-900">心理测评结果报告</h2>
-        <div
-          class="mx-auto mt-3 h-1 w-24 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500"
-        ></div>
+        <div class="mx-auto mt-3 h-1 w-24 rounded-full bg-blue-500"></div>
       </div>
 
       <!-- 总体评估卡片 -->
       <div
         class="mb-10 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-lg"
       >
-        <div
-          class="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 px-8 py-6"
-        >
+        <div class="bg-blue-50 px-8 py-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center justify-center space-x-3">
               <div class="rounded-full bg-blue-500 p-2">
@@ -160,9 +156,7 @@ const getProgressPercent = (value: number, range: number[]) => {
       <div class="mb-10">
         <div class="mb-8 flex items-center space-x-4">
           <div class="flex items-center space-x-3">
-            <div
-              class="h-8 w-1 rounded-full bg-gradient-to-b from-blue-500 to-indigo-500"
-            ></div>
+            <div class="h-8 w-1 rounded-full bg-blue-500"></div>
             <h3 class="text-xl font-bold text-gray-900">详细评估结果</h3>
           </div>
           <div class="flex-1 border-t border-gray-200"></div>
@@ -207,9 +201,7 @@ const getProgressPercent = (value: number, range: number[]) => {
             </div>
 
             <!-- 得分展示 -->
-            <div
-              class="mb-6 rounded-xl bg-gradient-to-r from-gray-50 to-blue-50 p-4"
-            >
+            <div class="mb-6 rounded-xl bg-gray-50 p-4">
               <div class="mb-3 flex items-end justify-between">
                 <span class="text-sm font-medium text-gray-600">得分</span>
                 <div class="text-right">
@@ -263,13 +255,9 @@ const getProgressPercent = (value: number, range: number[]) => {
         class="overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-lg"
       >
         <!-- 建议标题区域 -->
-        <div
-          class="bg-gradient-to-r from-amber-50 via-orange-50 to-red-50 px-8 py-6"
-        >
+        <div class="bg-amber-50 px-8 py-6">
           <div class="flex items-center space-x-4">
-            <div
-              class="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 p-2 shadow-lg"
-            >
+            <div class="rounded-full bg-amber-500 p-2 shadow-lg">
               <svg
                 class="h-5 w-5 text-white"
                 fill="currentColor"
@@ -293,9 +281,7 @@ const getProgressPercent = (value: number, range: number[]) => {
 
         <div class="p-8">
           <!-- 建议内容 -->
-          <div
-            class="mb-6 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 p-6"
-          >
+          <div class="mb-6 rounded-xl bg-amber-50 p-6">
             <div class="space-y-4">
               <div
                 v-for="(advice, index) in questionnaireData.summary.advice
@@ -314,9 +300,7 @@ const getProgressPercent = (value: number, range: number[]) => {
           </div>
 
           <!-- 温馨提示 -->
-          <div
-            class="rounded-xl border-2 border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50 p-6"
-          >
+          <div class="rounded-xl border-2 border-blue-100 bg-blue-50 p-6">
             <div class="mb-3 flex items-center space-x-3">
               <div class="rounded-full bg-blue-500 p-1">
                 <svg

@@ -1,12 +1,36 @@
 import type { VbenFormSchema } from '#/adapter/form';
 import type { VxeTableGridOptions } from '#/adapter/vxe-table';
 
+import { ref } from 'vue';
+
 import dayjs from 'dayjs';
 
 import {
-  ARTICLE_CATEGORY_OPTIONS,
   ARTICLE_STATUS_OPTIONS,
+  setCategoryOptionsCache,
 } from '#/api/evaluation/article';
+import { getArticleCategoryListSimple } from '#/api/evaluation/article-category';
+
+// 动态分类选项
+export const categoryOptions = ref<Array<{ label: string; value: number }>>([]);
+
+/** 加载文章分类选项 */
+export async function loadCategoryOptions() {
+  try {
+    const categories = await getArticleCategoryListSimple();
+    categoryOptions.value = categories.map((item) => ({
+      label: item.name,
+      value: item.id as number,
+    }));
+    // 同步更新缓存，用于getArticleCategoryLabel函数
+    setCategoryOptionsCache(categoryOptions.value);
+    return categoryOptions.value;
+  } catch {
+    categoryOptions.value = [];
+    setCategoryOptionsCache([]);
+    return [];
+  }
+}
 
 /** 新增/修改的表单 */
 export function useFormSchema(): VbenFormSchema[] {
@@ -46,12 +70,12 @@ export function useFormSchema(): VbenFormSchema[] {
       component: 'Textarea',
     },
     {
-      fieldName: 'category',
-      label: '文章类型',
+      fieldName: 'categoryId',
+      label: '文章分类',
       rules: 'required',
       component: 'Select',
       componentProps: {
-        options: ARTICLE_CATEGORY_OPTIONS,
+        options: categoryOptions,
       },
     },
     {
@@ -81,11 +105,11 @@ export function useFormSchema(): VbenFormSchema[] {
 export function useGridFormSchema(): VbenFormSchema[] {
   return [
     {
-      fieldName: 'category',
-      label: '文章类型',
+      fieldName: 'categoryId',
+      label: '文章分类',
       component: 'Select',
       componentProps: {
-        options: ARTICLE_CATEGORY_OPTIONS,
+        options: categoryOptions,
       },
     },
     {
@@ -128,9 +152,9 @@ export function useGridColumns(): VxeTableGridOptions['columns'] {
       title: '描述',
     },
     {
-      field: 'category',
+      field: 'categoryId',
       title: '分类',
-      slots: { default: 'category' },
+      slots: { default: 'categoryId' },
     },
     {
       field: 'viewCount',

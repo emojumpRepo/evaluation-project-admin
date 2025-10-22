@@ -4,7 +4,7 @@ import type { SystemMenuApi } from '#/api/system/menu';
 
 import { ref } from 'vue';
 
-import { DocAlert, Page, useVbenModal } from '@vben/common-ui';
+import { Page, useVbenModal } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
 import { message } from 'ant-design-vue';

@@ -18,7 +18,8 @@ import {
 } from '#/api/evaluation/article';
 import { $t } from '#/locales';
 
-import { useGridColumns, useGridFormSchema } from './data';
+import { loadCategoryOptions, useGridColumns, useGridFormSchema } from './data';
+import categoryManage from './modules/category-manage.vue';
 import editForm from './modules/edit-form.vue';
 
 /** 设置选中 ID */
@@ -34,9 +35,19 @@ const [FormModal, formModalApi] = useVbenModal({
   destroyOnClose: true,
 });
 
+const [CategoryManageModal, categoryManageModalApi] = useVbenModal({
+  connectedComponent: categoryManage,
+  destroyOnClose: true,
+});
+
 /** 新增文章 */
 function handleCreate() {
   formModalApi.setData({}).open();
+}
+
+/** 分类管理 */
+function handleCategoryManage() {
+  categoryManageModalApi.open();
 }
 
 /** 编辑 */
@@ -77,7 +88,8 @@ async function handleDeleteBatch() {
 }
 
 /** 刷新表格 */
-function onRefresh() {
+async function onRefresh() {
+  await loadCategoryOptions();
   gridApi.query();
 }
 
@@ -125,6 +137,7 @@ const [Grid, gridApi] = useVbenVxeGrid({
 });
 
 onMounted(async () => {
+  await loadCategoryOptions();
   await gridApi.query();
 });
 </script>
@@ -132,6 +145,7 @@ onMounted(async () => {
 <template>
   <Page auto-content-height>
     <FormModal @success="onRefresh" />
+    <CategoryManageModal @success="onRefresh" />
 
     <Grid table-title="文章列表">
       <template #toolbar-tools>
@@ -142,6 +156,12 @@ onMounted(async () => {
               type: 'primary',
               icon: 'lucide:plus',
               onClick: handleCreate,
+            },
+            {
+              label: '分类管理',
+              type: 'default',
+              icon: 'lucide:folder',
+              onClick: handleCategoryManage,
             },
             {
               label: '批量删除',
@@ -167,9 +187,9 @@ onMounted(async () => {
         </Tag>
       </template>
 
-      <template #category="{ row }">
+      <template #categoryId="{ row }">
         <Tag color="blue">
-          {{ getArticleCategoryLabel(row.category) }}
+          {{ getArticleCategoryLabel(row.categoryId) }}
         </Tag>
       </template>
 
