@@ -2,7 +2,7 @@
 import type { ColumnsType } from 'ant-design-vue/es/table';
 
 import type {
-  type BabyFileApi,
+  BabyFileApi,
   deleteBabyFile,
   getBabyFileListByBabyId,
   MemberBabyApi,
