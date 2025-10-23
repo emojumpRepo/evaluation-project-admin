@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import type { ColumnsType } from 'ant-design-vue/es/table';
 
-import type {
-  type BabyFileApi,
-  deleteBabyFile,
-  getBabyFileListByBabyId,
-  MemberBabyApi,
-} from '#/api/member/baby';
+import type { BabyFileApi, MemberBabyApi } from '#/api/member/baby';
 
 import { computed, h, ref } from 'vue';
 
@@ -23,6 +18,8 @@ import {
   Tabs,
   Tag,
 } from 'ant-design-vue';
+
+import { deleteBabyFile, getBabyFileListByBabyId } from '#/api/member/baby';
 
 import FileUpload from './FileUpload.vue';
 
