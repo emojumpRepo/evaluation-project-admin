@@ -3,7 +3,7 @@ import type { ColumnsType } from 'ant-design-vue/es/table';
 
 import type { BabyFileApi, MemberBabyApi } from '#/api/member/baby';
 
-import { computed, h, ref } from 'vue';
+import { computed, h, ref, watch } from 'vue';
 
 import { Download, Trash2, Upload } from '@vben/icons';
 
@@ -208,8 +208,34 @@ const handleFileUploadSuccess = () => {
 const showModal = () => {
   visible.value = true;
   activeTab.value = 'basic';
-  loadFileList();
 };
+
+// 监听标签页切换，当切换到附件管理时加载数据
+watch(activeTab, (newTab) => {
+  if (newTab === 'files' && visible.value) {
+    setTimeout(() => {
+      loadFileList();
+    }, 100);
+  }
+});
+
+// 监听弹窗打开状态，确保打开时如果是附件管理标签页则加载数据
+watch(visible, (newVisible) => {
+  if (newVisible && activeTab.value === 'files') {
+    setTimeout(() => {
+      loadFileList();
+    }, 100);
+  } else if (!newVisible) {
+    // 关闭弹窗时清理数据
+    fileList.value = [];
+    selectedRowKeys.value = [];
+    pagination.value = {
+      current: 1,
+      pageSize: 10,
+      total: 0,
+    };
+  }
+});
 
 defineExpose({
   showModal,
